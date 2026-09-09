@@ -26,6 +26,21 @@ const url = process.env[databaseEnvironmentKey]?.trim();
 const operator = process.env.PLATFORM_OPERATOR?.trim();
 const key = process.env.AUDIT_SEAL_KEY?.trim();
 const root = resolve(process.env.AUDIT_SEAL_DIR?.trim() || "./audit-seals");
+const tenantPageSql = `
+  select id,tenant_id,actor_id,subject_id,action,entity_type,entity_id,changes,
+         outcome,source,request_id,session_id,ip_address,user_agent,created_at
+    from audit_log
+   where created_at >= $1::timestamptz and created_at < $2::timestamptz
+     and (created_at,id) > ($3::timestamptz,$4::uuid)
+   order by created_at,id
+   limit $5`;
+const platformPageSql = `
+  select id,operator,action,tenant_id,target,changes,outcome,request_id,created_at
+    from platform_audit_log
+   where created_at >= $1::timestamptz and created_at < $2::timestamptz
+     and (created_at,id) > ($3::timestamptz,$4::uuid)
+   order by created_at,id
+   limit $5`;
 if (!url) fail(`${databaseEnvironmentKey} is required`);
 if (!operator) fail("PLATFORM_OPERATOR is required");
 if (!key || key.length < 32) fail("AUDIT_SEAL_KEY must contain at least 32 characters");
@@ -149,22 +164,6 @@ async function digestDay(date) {
   }
   return { digest: hash.digest("hex"), rowCount };
 }
-
-const tenantPageSql = `
-  select id,tenant_id,actor_id,subject_id,action,entity_type,entity_id,changes,
-         outcome,source,request_id,session_id,ip_address,user_agent,created_at
-    from audit_log
-   where created_at >= $1::timestamptz and created_at < $2::timestamptz
-     and (created_at,id) > ($3::timestamptz,$4::uuid)
-   order by created_at,id
-   limit $5`;
-const platformPageSql = `
-  select id,operator,action,tenant_id,target,changes,outcome,request_id,created_at
-    from platform_audit_log
-   where created_at >= $1::timestamptz and created_at < $2::timestamptz
-     and (created_at,id) > ($3::timestamptz,$4::uuid)
-   order by created_at,id
-   limit $5`;
 
 function sign(payload) {
   return createHmac("sha256", key).update(JSON.stringify(payload)).digest("hex");
