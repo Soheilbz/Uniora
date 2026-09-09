@@ -18,6 +18,10 @@ jobs:
     name: Static, type and behavioral gates
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      # Unit tests import database-backed modules but do not connect to this
+      # disposable URL; integration/operations jobs own all live DB checks.
+      DATABASE_URL: postgresql://localhost:5432/univ
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-toolchain
@@ -214,7 +218,7 @@ jobs:
         env:
           MFA_ACTIVE_KEY_ID: ci-mfa-new
           MFA_ROTATION_CONFIRM: ROTATE_MFA_KEYS
-        run: node scripts/mfa-rotate.mjs
+        run: pnpm exec tsx scripts/mfa-rotate.mjs
       - name: Backup old-key, rekey and verify
         run: |
           manifest="$(node scripts/platform-backup.mjs create)"
