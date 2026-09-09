@@ -5,9 +5,9 @@
  * rows to make sequential scans visible, ANALYZEs the tables, and then proves
  * the hot register/audit queries still use an RLS-safe indexed access path.
  * PostgreSQL deliberately does not push a non-leakproof user predicate such as
- * LIKE below a row-security policy, so a tenant-scoped B-tree access path is
- * the honest production plan for infix search. Requiring the standalone GIN
- * index by name here would test a plan the application cannot legally use.
+ * LIKE below a row-security policy. Fixture writes therefore use the owner
+ * connection, while every asserted plan uses the request-serving Web role so
+ * the gate observes the same RLS-aware access path as production.
  */
 import pg from "pg";
 
@@ -26,33 +26,45 @@ try {
 if (!/(?:test|e2e|perf|scale)/i.test(parsed.pathname))
   fail("performance database name must contain test, e2e, perf or scale");
 
-const db = new Client({ connectionString: url, application_name: "univ-performance-regression" });
-let transactionOpen = false;
+const applicationUrl =
+  process.env.PERF_DATABASE_URL?.trim() || process.env.DATABASE_URL?.trim() || url;
+const adminDb = new Client({
+  connectionString: url,
+  application_name: "univ-performance-fixture-admin",
+});
+const db = new Client({
+  connectionString: applicationUrl,
+  application_name: "univ-performance-regression",
+});
+let adminTransactionOpen = false;
+let planTransactionOpen = false;
+let tenantId;
+await adminDb.connect();
 await db.connect();
 try {
   const tenant = (
-    await db.query("select id from tenants where status='active' order by created_at limit 1")
+    await adminDb.query("select id from tenants where status='active' order by created_at limit 1")
   ).rows[0];
   if (!tenant?.id)
     throw new Error("seeded active tenant is required before performance regression");
-  const tenantId = tenant.id;
+  tenantId = tenant.id;
 
   // These tables are protected by the same RLS contract as the application.
-  // Establish the tenant inside the transaction instead of bypassing RLS with
-  // an owner connection; otherwise this regression test would validate a
-  // different query path than production actually uses.
-  await db.query("begin");
-  transactionOpen = true;
-  await db.query("select set_config('app.tenant_id',$1,true)", [tenantId]);
+  // Load fixtures with the owner, then assert plans through the Web role below
+  // so this gate never validates a privileged query path by accident.
+  await adminDb.query("begin");
+  adminTransactionOpen = true;
+  await adminDb.query("select set_config('app.tenant_id',$1,true)", [tenantId]);
 
-  await db.query("delete from audit_log where tenant_id=$1 and entity_type='performance_fixture'", [
+  await adminDb.query(
+    "delete from audit_log where tenant_id=$1 and entity_type='performance_fixture'",
+    [tenantId],
+  );
+  await adminDb.query("delete from students where tenant_id=$1 and student_number like 'perf-%'", [
     tenantId,
   ]);
-  await db.query("delete from students where tenant_id=$1 and student_number like 'perf-%'", [
-    tenantId,
-  ]);
 
-  await db.query(
+  await adminDb.query(
     `
     insert into students(tenant_id, student_number, first_name, last_name, degree, status, faculty, department, field_of_study, version)
     select $1,
@@ -65,7 +77,7 @@ try {
     [tenantId],
   );
 
-  await db.query(
+  await adminDb.query(
     `
     insert into audit_log(tenant_id, actor_id, action, entity_type, entity_id, changes, outcome, source, created_at)
     select $1, null, 'performance.event', 'performance_fixture',
@@ -76,8 +88,14 @@ try {
     [tenantId],
   );
 
-  await db.query("analyze students");
-  await db.query("analyze audit_log");
+  await adminDb.query("analyze students");
+  await adminDb.query("analyze audit_log");
+  await adminDb.query("commit");
+  adminTransactionOpen = false;
+
+  await db.query("begin");
+  planTransactionOpen = true;
+  await db.query("select set_config('app.tenant_id',$1,true)", [tenantId]);
 
   await assertPlan({
     name: "student number lookup",
@@ -109,11 +127,26 @@ try {
   });
 
   await db.query("commit");
-  transactionOpen = false;
+  planTransactionOpen = false;
   console.log("performance regression ok");
 } finally {
-  if (transactionOpen) await db.query("rollback");
+  if (planTransactionOpen) await db.query("rollback");
+  if (adminTransactionOpen) await adminDb.query("rollback");
+  if (tenantId) {
+    await adminDb.query("begin");
+    await adminDb.query("select set_config('app.tenant_id',$1,true)", [tenantId]);
+    await adminDb.query(
+      "delete from audit_log where tenant_id=$1 and entity_type='performance_fixture'",
+      [tenantId],
+    );
+    await adminDb.query(
+      "delete from students where tenant_id=$1 and student_number like 'perf-%'",
+      [tenantId],
+    );
+    await adminDb.query("commit");
+  }
   await db.end();
+  await adminDb.end();
 }
 
 async function assertPlan({ name, sql, values, index, tenantIndexed = false, maxMs }) {

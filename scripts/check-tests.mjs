@@ -233,7 +233,8 @@ if (!/image:\s*postgres:18/.test(operations)) {
 const nodePins = [...ci.matchAll(/node-version:\s*([^\n#]+)|runtime:\s*node@([^\n#]+)/g)].map(
   (match) => (match[1] ?? match[2]).trim(),
 );
-const sharedToolchainUses = (ci.match(/uses:\s+\.\/\.github\/actions\/setup-toolchain/g) ?? []).length;
+const sharedToolchainUses = (ci.match(/uses:\s+\.\/\.github\/actions\/setup-toolchain/g) ?? [])
+  .length;
 const nodeVersionFile = readFileSync(join(root, ".node-version"), "utf8").trim();
 if (
   sharedToolchainUses < 4 ||
