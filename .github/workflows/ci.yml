@@ -264,18 +264,25 @@ jobs:
           OBJECT_STORAGE_ACCESS_KEY_ID: ci-worker
           OBJECT_STORAGE_SECRET_ACCESS_KEY: ci-worker-secret
           ANTIVIRUS_HTTP_ENDPOINT: http://127.0.0.1:9110/scan
-        run: >-
-          psql "$DATABASE_ADMIN_URL" -c "insert into jobs(tenant_id,requested_by,kind)
-          values ('00000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000002','export.students')"
-          && env -u DATABASE_ADMIN_URL -u DATABASE_PLATFORM_URL -u APP_DB_PASSWORD
-          -u WORKER_DB_PASSWORD -u PLATFORM_DB_PASSWORD -u BETTER_AUTH_SECRET
-          -u MFA_ENCRYPTION_KEY -u MFA_ENCRYPTION_KEYS -u MFA_ACTIVE_KEY_ID
-          -u PLATFORM_OPERATION_ENCRYPTION_KEY -u BACKUP_ENCRYPTION_KEY
-          -u BACKUP_ENCRYPTION_KEYS -u BACKUP_ACTIVE_KEY_ID -u BACKUP_DIR
-          -u BACKUP_OFFSITE_DIR -u AUDIT_SEAL_KEY -u AUDIT_SEAL_DIR
-          -u PLATFORM_RESTORE_ALLOWED -u PLATFORM_CROSS_TARGET_RESTORE
-          node scripts/job-worker.mjs --once
-          && echo "rc.capability='data.export' export worker re-authorization drill ok"
+        run: |
+          job_id="$(psql "$DATABASE_ADMIN_URL" -Atc "
+            insert into jobs(tenant_id,requested_by,kind)
+            select t.id,u.id,'export.students'
+              from tenants t
+              join \"user\" u on u.tenant_id=t.id
+             where t.slug='univ' and u.display_username='admin'
+            returning id
+          ")"
+          [[ "$job_id" =~ ^[0-9a-f-]{36}$ ]]
+          env -u DATABASE_ADMIN_URL -u DATABASE_PLATFORM_URL -u APP_DB_PASSWORD \
+            -u WORKER_DB_PASSWORD -u PLATFORM_DB_PASSWORD -u BETTER_AUTH_SECRET \
+            -u MFA_ENCRYPTION_KEY -u MFA_ENCRYPTION_KEYS -u MFA_ACTIVE_KEY_ID \
+            -u PLATFORM_OPERATION_ENCRYPTION_KEY -u BACKUP_ENCRYPTION_KEY \
+            -u BACKUP_ENCRYPTION_KEYS -u BACKUP_ACTIVE_KEY_ID -u BACKUP_DIR \
+            -u BACKUP_OFFSITE_DIR -u AUDIT_SEAL_KEY -u AUDIT_SEAL_DIR \
+            -u PLATFORM_RESTORE_ALLOWED -u PLATFORM_CROSS_TARGET_RESTORE \
+            node scripts/job-worker.mjs --once
+          echo "rc.capability='data.export' export worker re-authorization drill ok"
       - name: Backup restore drill
         run: >-
           PLATFORM_RESTORE_ALLOWED=YES node scripts/platform-backup.mjs restore
