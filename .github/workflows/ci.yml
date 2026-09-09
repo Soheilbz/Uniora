@@ -257,7 +257,7 @@ jobs:
           DATABASE_URL: postgresql://univ_app_web:web-password@localhost:5432/univ
           EXPORT_JOB_DIR: ${{ github.workspace }}/.univ/ci-exports
           PLATFORM_OPERATOR: ci-tenant-worker
-          INTEGRATION_ENCRYPTION_KEY: 1111111111111111111111111111111111111111111111111111111111111111
+          INTEGRATION_ENCRYPTION_KEY: '1111111111111111111111111111111111111111111111111111111111111111'
           OBJECT_STORAGE_ENDPOINT: http://127.0.0.1:9100
           OBJECT_STORAGE_PUBLIC_ENDPOINT: http://127.0.0.1:9100
           OBJECT_STORAGE_BUCKET: univ-ci
@@ -353,6 +353,26 @@ jobs:
           node-version: 24.20.0
       - name: Install exact dependency graph
         run: pnpm install --frozen-lockfile
+      - name: Restore pinned Playwright browsers
+        uses: actions/cache@3edfce9056124e459a23f683a21433670d47daca # v6.1.0
+        with:
+          path: .univ/cache/ms-playwright
+          key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package.json', 'pnpm-lock.yaml') }}
+      - name: Install pinned Playwright browsers on cache miss
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.univ/cache/ms-playwright
+        run: |
+          set -euo pipefail
+          mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
+          missing=0
+          compgen -G "$PLAYWRIGHT_BROWSERS_PATH/chromium-*/chrome-linux/chrome" >/dev/null || missing=1
+          compgen -G "$PLAYWRIGHT_BROWSERS_PATH/firefox-*/firefox/firefox" >/dev/null || missing=1
+          compgen -G "$PLAYWRIGHT_BROWSERS_PATH/webkit-*/pw_run.sh" >/dev/null || missing=1
+          if (( missing )); then
+            pnpm exec playwright install chromium firefox webkit
+          else
+            echo "all pinned Playwright browser binaries restored from cache"
+          fi
       - name: Apply migrations
         run: pnpm db:migrate
       - name: Provision runtime roles
