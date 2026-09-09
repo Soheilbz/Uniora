@@ -247,10 +247,34 @@ jobs:
           UNIV_WEB_OPERATIONS_ENV_FILE: ${{ github.workspace }}/.env.operations.example
         run: docker compose -f deploy/compose.production.yml config
       - name: Background export worker drill
+        env:
+          # This drill must run with the tenant worker contract, not the
+          # privileged operations environment inherited by this job. The
+          # export path is filesystem-backed here, so the required external
+          # storage/scanner origins are inert loopback contract values.
+          NODE_ENV: development
+          DATABASE_WORKER_URL: postgresql://univ_job_worker:worker-password@localhost:5432/univ
+          DATABASE_URL: postgresql://univ_app_web:web-password@localhost:5432/univ
+          EXPORT_JOB_DIR: ${{ github.workspace }}/.univ/ci-exports
+          PLATFORM_OPERATOR: ci-tenant-worker
+          INTEGRATION_ENCRYPTION_KEY: 1111111111111111111111111111111111111111111111111111111111111111
+          OBJECT_STORAGE_ENDPOINT: http://127.0.0.1:9100
+          OBJECT_STORAGE_PUBLIC_ENDPOINT: http://127.0.0.1:9100
+          OBJECT_STORAGE_BUCKET: univ-ci
+          OBJECT_STORAGE_ACCESS_KEY_ID: ci-worker
+          OBJECT_STORAGE_SECRET_ACCESS_KEY: ci-worker-secret
+          ANTIVIRUS_HTTP_ENDPOINT: http://127.0.0.1:9110/scan
         run: >-
           psql "$DATABASE_ADMIN_URL" -c "insert into jobs(tenant_id,requested_by,kind)
           values ('00000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-000000000002','export.students')"
-          && node scripts/job-worker.mjs --once
+          && env -u DATABASE_ADMIN_URL -u DATABASE_PLATFORM_URL -u APP_DB_PASSWORD
+          -u WORKER_DB_PASSWORD -u PLATFORM_DB_PASSWORD -u BETTER_AUTH_SECRET
+          -u MFA_ENCRYPTION_KEY -u MFA_ENCRYPTION_KEYS -u MFA_ACTIVE_KEY_ID
+          -u PLATFORM_OPERATION_ENCRYPTION_KEY -u BACKUP_ENCRYPTION_KEY
+          -u BACKUP_ENCRYPTION_KEYS -u BACKUP_ACTIVE_KEY_ID -u BACKUP_DIR
+          -u BACKUP_OFFSITE_DIR -u AUDIT_SEAL_KEY -u AUDIT_SEAL_DIR
+          -u PLATFORM_RESTORE_ALLOWED -u PLATFORM_CROSS_TARGET_RESTORE
+          node scripts/job-worker.mjs --once
           && echo "rc.capability='data.export' export worker re-authorization drill ok"
       - name: Backup restore drill
         run: >-
