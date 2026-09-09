@@ -1,19 +1,26 @@
 name: Univ Web toolchain
 description: Set up the pinned Node.js, vendored pnpm runtime, and repository-local pnpm cache.
 
+inputs:
+  node-version:
+    description: Exact Node.js version declared by the repository pin.
+    required: false
+    default: 24.20.0
+
 runs:
   using: composite
   steps:
     - name: Use the repository Node.js pin
       uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
       with:
-        node-version-file: .node-version
+        node-version: ${{ inputs.node-version }}
         package-manager-cache: false
 
     - name: Install the vendored pnpm runtime
       shell: bash
       run: |
         set -euo pipefail
+        test "${{ inputs.node-version }}" = "$(tr -d '\r\n' < .node-version)"
         pnpm_version="$(node -p "require('./package.json').packageManager.replace(/^pnpm@/, '')")"
         mkdir -p "$RUNNER_TEMP/univ-pnpm/bin"
         ln -sf "$GITHUB_WORKSPACE/toolchain/pnpm/$pnpm_version/bin/pnpm.mjs" "$RUNNER_TEMP/univ-pnpm/bin/pnpm"

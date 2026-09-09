@@ -21,6 +21,8 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-toolchain
+        with:
+          node-version: 24.20.0
       - name: Install exact dependency graph
         run: pnpm install --frozen-lockfile
       - name: Run complete project check
@@ -36,13 +38,52 @@ jobs:
     name: Performance regression
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18.6@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280
+        env:
+          POSTGRES_USER: univ_owner
+          POSTGRES_PASSWORD: ci-performance-owner
+          POSTGRES_DB: univ_perf
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U univ_owner -d univ_perf"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_ADMIN_URL: postgresql://univ_owner:ci-performance-owner@localhost:5432/univ_perf
+      DATABASE_URL: postgresql://univ_app_web:ci-performance-web@localhost:5432/univ_perf
+      DATABASE_WORKER_URL: postgresql://univ_job_worker:ci-performance-worker@localhost:5432/univ_perf
+      DATABASE_PLATFORM_URL: postgresql://univ_platform_worker:ci-performance-platform@localhost:5432/univ_perf
+      APP_DB_PASSWORD: ci-performance-web
+      WORKER_DB_PASSWORD: ci-performance-worker
+      PLATFORM_DB_PASSWORD: ci-performance-platform
+      BETTER_AUTH_SECRET: ci-performance-auth-key-0123456789abcdef0123456789abcdef
+      BETTER_AUTH_URL: http://127.0.0.1:3020
+      SEED_ADMIN_PASSWORD: ci-performance-seed-password
+      MFA_ENCRYPTION_KEY: ci-performance-mfa-key-0123456789abcdef0123456789
+      PLATFORM_OPERATION_ENCRYPTION_KEY: ci-performance-platform-key-0123456789abcdef
+      INTEGRATION_ENCRYPTION_KEY: ci-performance-integration-key-0123456789abcdef
+      PUBLIC_FORM_RATE_SALT: ci-performance-public-form-salt-0123456789abcdef
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-toolchain
+        with:
+          node-version: 24.20.0
       - name: Install exact dependency graph
         run: pnpm install --frozen-lockfile
+      - name: Apply migrations
+        run: pnpm db:migrate
+      - name: Provision runtime roles
+        run: pnpm db:setup
+      - name: Seed disposable performance database
+        run: pnpm seed
       - name: Run performance regression
         run: pnpm performance:regression
+        env:
+          PERF_CONFIRM: I_UNDERSTAND_TEST_DATABASE
 
   integration:
     name: PostgreSQL integration suite
@@ -55,6 +96,8 @@ jobs:
           POSTGRES_USER: univ_owner
           POSTGRES_PASSWORD: ci-integration-owner
           POSTGRES_DB: univ
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U univ_owner -d univ"
           --health-interval 10s
@@ -79,6 +122,8 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-toolchain
+        with:
+          node-version: 24.20.0
       - name: Install exact dependency graph
         run: pnpm install --frozen-lockfile
       - name: Apply migrations
@@ -101,16 +146,18 @@ jobs:
           POSTGRES_USER: univ_owner
           POSTGRES_PASSWORD: ci-owner-password
           POSTGRES_DB: univ
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U univ_owner -d univ"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
     env:
-      DATABASE_ADMIN_URL: postgresql://univ_owner:ci-owner-password@postgres:5432/univ
-      DATABASE_WORKER_URL: postgresql://univ_job_worker:worker-password@postgres:5432/univ
-      DATABASE_PLATFORM_URL: postgresql://univ_platform_worker:platform-password@postgres:5432/univ
-      DATABASE_URL: postgresql://univ_app_web:web-password@postgres:5432/univ
+      DATABASE_ADMIN_URL: postgresql://univ_owner:ci-owner-password@localhost:5432/univ
+      DATABASE_WORKER_URL: postgresql://univ_job_worker:worker-password@localhost:5432/univ
+      DATABASE_PLATFORM_URL: postgresql://univ_platform_worker:platform-password@localhost:5432/univ
+      DATABASE_URL: postgresql://univ_app_web:web-password@localhost:5432/univ
       APP_DB_PASSWORD: web-password
       WORKER_DB_PASSWORD: worker-password
       PLATFORM_DB_PASSWORD: platform-password
@@ -137,6 +184,8 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-toolchain
+        with:
+          node-version: 24.20.0
       - name: Install exact dependency graph
         run: pnpm install --frozen-lockfile
       - name: PostgreSQL client contract
@@ -200,6 +249,8 @@ jobs:
           POSTGRES_USER: univ_owner
           POSTGRES_PASSWORD: ci-e2e-owner
           POSTGRES_DB: univ
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U univ_owner -d univ"
           --health-interval 10s
@@ -207,11 +258,20 @@ jobs:
           --health-retries 10
     env:
       DATABASE_ADMIN_URL: postgresql://univ_owner:ci-e2e-owner@localhost:5432/univ
+      APP_DB_PASSWORD: ci-e2e-web-password
+      WORKER_DB_PASSWORD: ci-e2e-worker-password
+      PLATFORM_DB_PASSWORD: ci-e2e-platform-password
+      BETTER_AUTH_SECRET: ci-e2e-build-auth-key-0123456789abcdef0123456789abcdef
+      BETTER_AUTH_URL: http://127.0.0.1:3020
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-toolchain
+        with:
+          node-version: 24.20.0
       - name: Install exact dependency graph
         run: pnpm install --frozen-lockfile
+      - name: Provision runtime roles
+        run: pnpm db:setup
       - name: Production build
         run: pnpm build
       - name: Run E2E shards against the fresh build

@@ -227,14 +227,19 @@ if (!/image:\s*postgres:18/.test(operations)) {
 
 /* Docker, CI and package.json must test the same Node minor. A floating major
  * can turn a green runner into a different runtime from the release image. */
-/* pnpm/setup provisions Node through its `runtime: node@...` input rather
- * than actions/setup-node's `node-version`. Accept both equivalent forms,
- * while still requiring every declared runtime pin to be the exact release
- * minor promised by package.json. */
+/* The shared action receives the exact workflow pin and verifies it against
+ * .node-version. Keep accepting direct pins for older/local workflow forms,
+ * while requiring all four CI jobs to use the shared action. */
 const nodePins = [...ci.matchAll(/node-version:\s*([^\n#]+)|runtime:\s*node@([^\n#]+)/g)].map(
   (match) => (match[1] ?? match[2]).trim(),
 );
-if (nodePins.length < 4 || nodePins.some((pin) => pin !== "24.20.0")) {
+const sharedToolchainUses = (ci.match(/uses:\s+\.\/\.github\/actions\/setup-toolchain/g) ?? []).length;
+const nodeVersionFile = readFileSync(join(root, ".node-version"), "utf8").trim();
+if (
+  sharedToolchainUses < 4 ||
+  nodeVersionFile !== "24.20.0" ||
+  nodePins.some((pin) => pin !== "24.20.0")
+) {
   issues.push("ci.yml: every job must pin Node 24.20.0 exactly");
 }
 
