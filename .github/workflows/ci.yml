@@ -269,7 +269,7 @@ jobs:
           do $$
           declare
             seeded_tenant_id uuid;
-            seeded_requester_id uuid;
+            seeded_requester_id text;
           begin
             select id into seeded_tenant_id from tenants where slug='univ';
             if seeded_tenant_id is null then
