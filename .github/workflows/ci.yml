@@ -229,6 +229,10 @@ jobs:
           node scripts/platform-backup.mjs verify --file "$rekeyed"
           echo "BACKUP_MANIFEST=$rekeyed" >> "$GITHUB_ENV"
       - name: Audit seal chain drill
+        env:
+          # The platform role is the reviewed cross-tenant reader for audit
+          # sealing; the owner role intentionally remains FORCE RLS-bound.
+          DATABASE_ADMIN_URL: ${{ env.DATABASE_PLATFORM_URL }}
         run: |
           seal_date="$(date -u -d 'yesterday' +%F)"
           node scripts/audit-seal.mjs create --date "$seal_date"
