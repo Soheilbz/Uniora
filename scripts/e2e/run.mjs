@@ -14,6 +14,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { findFreePorts } from "../runtime-port.ts";
 import { startPlatformWorker } from "./platform-worker.mjs";
+import { provisionLanes } from "./provision-lanes.mjs";
 
 /**
  * Runs the E2E suite as several parallel groups.
@@ -222,21 +223,6 @@ const laneConcurrency = Math.max(
   Math.min(lanes.length, Number(process.env.E2E_LANE_CONCURRENCY) || 2),
 );
 
-/* Database provisioning is independent per lane, but it still shares one
- * PostgreSQL cluster. Keep its default bounded by the same safe concurrency
- * budget as the browser phase; an explicit lower value is useful on smaller
- * developer machines without changing the qualification default. */
-const requestedProvisionConcurrency = Number(process.env.E2E_PROVISION_CONCURRENCY);
-const provisionConcurrency = Math.max(
-  1,
-  Math.min(
-    laneConcurrency,
-    Number.isFinite(requestedProvisionConcurrency) && requestedProvisionConcurrency > 0
-      ? Math.floor(requestedProvisionConcurrency)
-      : laneConcurrency,
-  ),
-);
-
 /* A lane owns one Web pool, while all lanes share the same disposable
  * PostgreSQL cluster. Keep aggregate E2E demand below the cluster ceiling and
  * leave room for Playwright hooks, provisioning checks and the database's
@@ -289,84 +275,17 @@ function cleanupLaneDatabases() {
 }
 
 console.log("── provisioning ──");
-function prepareLane(lane) {
-  const env = groupEnv(lane.group, lane.project);
-  /* Stale cookies or state from an earlier run would survive a rebuild of
-     the database only to point at sessions that no longer exist. */
-  rmSync(env.E2E_AUTH_DIR, { recursive: true, force: true });
-  rmSync(env.E2E_STATE_FILE, { force: true });
-  /* Playwright creates this lazily, but all groups start together. Creating
-     every output directory up front prevents one group's reporter cleanup
-     from observing another group's not-yet-created directory. */
-  rmSync(env.E2E_ARTIFACTS_DIR, { recursive: true, force: true });
-  mkdirSync(env.E2E_ARTIFACTS_DIR, { recursive: true });
-}
-
-function startProvision(lane) {
-  const env = groupEnv(lane.group, lane.project);
-  const label = `[g${lane.group}/${lane.project}] `;
-  const child = spawn(process.execPath, [join("scripts", "e2e", "provision.mjs")], {
-    cwd: root,
-    env: { ...process.env, ...env },
-    stdio: ["ignore", "pipe", "pipe"],
+try {
+  await provisionLanes({
+    concurrency: laneConcurrency,
+    groupEnv,
+    lanes,
+    root,
   });
-  let stdout = "";
-  let stderr = "";
-  child.stdout.on("data", (chunk) => {
-    stdout += chunk.toString();
-  });
-  child.stderr.on("data", (chunk) => {
-    stderr += chunk.toString();
-  });
-  const result = new Promise((resolveResult) => {
-    const finish = (code, signal, error) =>
-      resolveResult({ code: code ?? 1, signal, error, lane, label, stdout, stderr });
-    child.once("error", (error) => finish(1, null, error));
-    child.once("exit", (code, signal) => finish(code, signal));
-  });
-  return { child, result };
-}
-
-async function provisionBatch(batch) {
-  const running = batch.map((lane) => {
-    prepareLane(lane);
-    return startProvision(lane);
-  });
-  let firstFailure;
-  const results = await Promise.all(
-    running.map(async ({ result }) => {
-      const outcome = await result;
-      if (outcome.code !== 0 && !firstFailure) {
-        firstFailure = outcome;
-        for (const peer of running) {
-          if (peer.child.exitCode === null) peer.child.kill("SIGTERM");
-        }
-      }
-      return outcome;
-    }),
-  );
-  for (const outcome of results) {
-    process.stdout.write(
-      `${outcome.label}provision ${groupEnv(outcome.lane.group, outcome.lane.project).E2E_DB_NAME}\n`,
-    );
-    if (outcome.stdout) process.stdout.write(outcome.stdout);
-    if (outcome.stderr) process.stderr.write(outcome.stderr);
-  }
-  return results;
-}
-
-console.log(`provisioning in batches of ${provisionConcurrency}`);
-for (let offset = 0; offset < lanes.length; offset += provisionConcurrency) {
-  const batch = lanes.slice(offset, offset + provisionConcurrency);
-  const results = await provisionBatch(batch);
-  const failed = results.find((outcome) => outcome.code !== 0);
-  if (failed) {
-    console.error(
-      `${failed.label}provision failed${failed.error ? `: ${failed.error.message}` : ""}`,
-    );
-    cleanupLaneDatabases();
-    process.exit(failed.code);
-  }
+} catch (error) {
+  cleanupLaneDatabases();
+  console.error("E2E provisioning failed:", error);
+  process.exit(error.exitCode ?? 1);
 }
 
 /* Line-buffered relay, so concurrent groups cannot interleave mid-line. */
