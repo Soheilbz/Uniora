@@ -222,6 +222,15 @@ const laneConcurrency = Math.max(
   Math.min(lanes.length, Number(process.env.E2E_LANE_CONCURRENCY) || 2),
 );
 
+/* Database provisioning is independent per lane, but it still shares one
+ * PostgreSQL cluster. Keep its default bounded by the same safe concurrency
+ * budget as the browser phase; an explicit lower value is useful on smaller
+ * developer machines without changing the qualification default. */
+const provisionConcurrency = Math.max(
+  1,
+  Math.min(lanes.length, Number(process.env.E2E_PROVISION_CONCURRENCY) || laneConcurrency),
+);
+
 /* A lane owns one Web pool, while all lanes share the same disposable
  * PostgreSQL cluster. Keep aggregate E2E demand below the cluster ceiling and
  * leave room for Playwright hooks, provisioning checks and the database's
@@ -274,7 +283,7 @@ function cleanupLaneDatabases() {
 }
 
 console.log("── provisioning ──");
-for (const lane of lanes) {
+function prepareLane(lane) {
   const env = groupEnv(lane.group, lane.project);
   /* Stale cookies or state from an earlier run would survive a rebuild of
      the database only to point at sessions that no longer exist. */
@@ -285,17 +294,72 @@ for (const lane of lanes) {
      from observing another group's not-yet-created directory. */
   rmSync(env.E2E_ARTIFACTS_DIR, { recursive: true, force: true });
   mkdirSync(env.E2E_ARTIFACTS_DIR, { recursive: true });
+}
+
+function startProvision(lane) {
+  const env = groupEnv(lane.group, lane.project);
   const label = `[g${lane.group}/${lane.project}] `;
-  process.stdout.write(`${label}provision ${env.E2E_DB_NAME}\n`);
-  const ran = spawnSync(process.execPath, [join("scripts", "e2e", "provision.mjs")], {
+  const child = spawn(process.execPath, [join("scripts", "e2e", "provision.mjs")], {
     cwd: root,
-    encoding: "utf8",
     env: { ...process.env, ...env },
+    stdio: ["ignore", "pipe", "pipe"],
   });
-  if (ran.status !== 0) {
-    console.error(`${label}provision failed:\n${ran.stdout}${ran.stderr}`);
+  let stdout = "";
+  let stderr = "";
+  child.stdout.on("data", (chunk) => {
+    stdout += chunk.toString();
+  });
+  child.stderr.on("data", (chunk) => {
+    stderr += chunk.toString();
+  });
+  const result = new Promise((resolveResult) => {
+    const finish = (code, signal, error) =>
+      resolveResult({ code: code ?? 1, signal, error, lane, label, stdout, stderr });
+    child.once("error", (error) => finish(1, null, error));
+    child.once("exit", (code, signal) => finish(code, signal));
+  });
+  return { child, result };
+}
+
+async function provisionBatch(batch) {
+  const running = batch.map((lane) => {
+    prepareLane(lane);
+    return startProvision(lane);
+  });
+  let firstFailure;
+  const results = await Promise.all(
+    running.map(async ({ result }) => {
+      const outcome = await result;
+      if (outcome.code !== 0 && !firstFailure) {
+        firstFailure = outcome;
+        for (const peer of running) {
+          if (peer.child.exitCode === null) peer.child.kill("SIGTERM");
+        }
+      }
+      return outcome;
+    }),
+  );
+  for (const outcome of results) {
+    process.stdout.write(
+      `${outcome.label}provision ${groupEnv(outcome.lane.group, outcome.lane.project).E2E_DB_NAME}\n`,
+    );
+    if (outcome.stdout) process.stdout.write(outcome.stdout);
+    if (outcome.stderr) process.stderr.write(outcome.stderr);
+  }
+  return results;
+}
+
+console.log(`provisioning in batches of ${provisionConcurrency}`);
+for (let offset = 0; offset < lanes.length; offset += provisionConcurrency) {
+  const batch = lanes.slice(offset, offset + provisionConcurrency);
+  const results = await provisionBatch(batch);
+  const failed = results.find((outcome) => outcome.code !== 0);
+  if (failed) {
+    console.error(
+      `${failed.label}provision failed${failed.error ? `: ${failed.error.message}` : ""}`,
+    );
     cleanupLaneDatabases();
-    process.exit(ran.status ?? 1);
+    process.exit(failed.code);
   }
 }
 
