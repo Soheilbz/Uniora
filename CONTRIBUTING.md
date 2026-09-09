@@ -1,26 +1,16 @@
-# Contributing
+# Contributing to Uniora
 
-This source tree is maintained as a production application, not a collection of independent scripts.
+Uniora is proprietary software. The public repository is available for inspection, but
+it is not an open-source project and does not accept unsolicited code contributions.
 
-## Before changing code
+Before sharing a patch, design proposal or pull request, obtain written permission from
+the project owner. A pull request, issue, patch or discussion does not grant permission
+to use, copy, publish, distribute or create derivative works from the source.
 
-1. Preserve the modular-monolith architecture unless an approved architecture decision says otherwise.
-2. Preserve PostgreSQL RLS and tenant-scoped transaction boundaries.
-3. Put domain business logic in application/domain modules, not route handlers or Server Actions.
-4. Do not add Redis, Kafka, Elasticsearch, Kubernetes, generic BPM or Event Sourcing without measured need and an explicit design decision.
-5. Do not store permanent attachments in PostgreSQL or local disk.
-6. Never introduce a second implementation for an existing rule or workflow when the canonical service can be extended.
+Approved maintainers must preserve the product's security, privacy, tenant separation,
+auditability and release controls. Technical quality gates and deployment procedures are
+documented for authorized maintainers in the repository documentation.
 
-## Quality gates
-
-On the supported Linux development/release environment:
-
-```bash
-pnpm release:prepare
-pnpm check
-pnpm test:integration
-pnpm e2e
-pnpm release:audit
-```
-
-Update migration safety metadata, architecture/release documentation and tests when changing database, security, job, integration or official-record contracts.
+Do not include credentials, personal records, production data, private keys or sensitive
+security details in issues or pull requests. Use the [security policy](SECURITY.md) for
+private vulnerability reporting.
