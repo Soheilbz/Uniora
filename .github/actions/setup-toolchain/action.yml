@@ -8,6 +8,7 @@ runs:
       uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
       with:
         node-version-file: .node-version
+        package-manager-cache: false
 
     - name: Install the vendored pnpm runtime
       shell: bash
@@ -16,6 +17,7 @@ runs:
         pnpm_version="$(node -p "require('./package.json').packageManager.replace(/^pnpm@/, '')")"
         mkdir -p "$RUNNER_TEMP/univ-pnpm/bin"
         ln -sf "$GITHUB_WORKSPACE/toolchain/pnpm/$pnpm_version/bin/pnpm.mjs" "$RUNNER_TEMP/univ-pnpm/bin/pnpm"
+        export PATH="$RUNNER_TEMP/univ-pnpm/bin:$PATH"
         echo "$RUNNER_TEMP/univ-pnpm/bin" >> "$GITHUB_PATH"
         node --version
         pnpm --version
