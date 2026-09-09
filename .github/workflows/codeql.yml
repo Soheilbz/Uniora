@@ -12,7 +12,8 @@ permissions:
 
 concurrency:
   group: codeql-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  # A newer commit supersedes an older analysis for the same ref.
+  cancel-in-progress: true
 
 jobs:
   analyze:

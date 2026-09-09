@@ -8,7 +8,9 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  # A newer commit supersedes an older candidate/main run; do not consume a
+  # runner on an artifact that can no longer be the merge candidate.
+  cancel-in-progress: true
 
 permissions:
   contents: read
