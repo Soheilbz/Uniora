@@ -1,0 +1,2 @@
+ALTER TABLE platform_operation_requests DROP CONSTRAINT IF EXISTS platform_operation_requests_kind_check;--> statement-breakpoint
+ALTER TABLE platform_operation_requests ADD CONSTRAINT platform_operation_requests_kind_check CHECK (kind IN ('tenant.create','tenant.rename','tenant.suspend','tenant.resume','tenant.archive','tenant.owner.set','tenant.user.create','tenant.user.password.reset','backup.create','backup.verify','break-glass.start','break-glass.end'));--> statement-breakpoint

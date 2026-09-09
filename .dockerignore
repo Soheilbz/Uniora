@@ -1,0 +1,42 @@
+# Never send local state, credentials or generated artifacts to the Docker
+# builder. Production images are built from source, not from a developer's
+# checkout state.
+.git
+.git/**
+.univ
+.univ/**
+node_modules
+node_modules/**
+.next
+.next/**
+.next-dev
+.next-dev/**
+.next-release
+.next-release/**
+e2e
+e2e/**
+coverage
+coverage/**
+playwright-report
+playwright-report/**
+test-results
+test-results/**
+*.log
+*.zip
+*.dump
+*.dump.enc.json
+backups
+backups/**
+exports
+exports/**
+audit-seals
+audit-seals/**
+dr-reports
+dr-reports/**
+.env
+.env.*
+!.env*.example
+*.pem
+*.key
+.vscode
+.idea

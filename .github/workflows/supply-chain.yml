@@ -1,0 +1,121 @@
+name: Supply chain
+
+on:
+  push:
+    branches: [main, 'codex/**']
+  pull_request:
+  schedule:
+    - cron: "17 3 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supply-chain-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Dependency review
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: high
+
+  images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-toolchain
+      - name: Materialize verified offline Docker dependency contexts
+        run: pnpm install --frozen-lockfile
+      - name: Build isolated runtime images
+        run: |
+          pnpm_store="$(pnpm store path)"
+          pnpm_store="${pnpm_store%/v11}"
+          pnpm_metadata="$HOME/.cache/pnpm"
+          test -f "$pnpm_store/v11/index.db"
+          test -d "$pnpm_metadata"
+          docker buildx build --load --progress=plain \
+            --build-context pnpm-store="$pnpm_store" \
+            --build-context pnpm-metadata="$pnpm_metadata" \
+            --target runner --tag univ-web:supply-chain .
+          docker buildx build --load --progress=plain \
+            --build-context pnpm-store="$pnpm_store" \
+            --build-context pnpm-metadata="$pnpm_metadata" \
+            --target tenant-worker --tag univ-web-tenant-worker:supply-chain .
+          docker buildx build --load --progress=plain \
+            --build-context pnpm-store="$pnpm_store" \
+            --build-context pnpm-metadata="$pnpm_metadata" \
+            --target platform-worker --tag univ-web-platform-worker:supply-chain .
+          docker buildx build --load --progress=plain \
+            --build-context pnpm-store="$pnpm_store" \
+            --build-context pnpm-metadata="$pnpm_metadata" \
+            --target operations --tag univ-web-operations:supply-chain .
+      - name: Generate runner image SBOM
+        uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
+        with:
+          image: univ-web:supply-chain
+          format: spdx-json
+          output-file: sbom-runner.spdx.json
+      - name: Generate tenant-worker image SBOM
+        uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
+        with:
+          image: univ-web-tenant-worker:supply-chain
+          format: spdx-json
+          output-file: sbom-tenant-worker.spdx.json
+      - name: Generate platform-worker image SBOM
+        uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
+        with:
+          image: univ-web-platform-worker:supply-chain
+          format: spdx-json
+          output-file: sbom-platform-worker.spdx.json
+      - name: Generate operations image SBOM
+        uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
+        with:
+          image: univ-web-operations:supply-chain
+          format: spdx-json
+          output-file: sbom-operations.spdx.json
+      - name: Trivy runner image vulnerability scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: univ-web:supply-chain
+          format: table
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: os,library
+      - name: Trivy tenant-worker image vulnerability scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: univ-web-tenant-worker:supply-chain
+          format: table
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: os,library
+      - name: Trivy platform-worker image vulnerability scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: univ-web-platform-worker:supply-chain
+          format: table
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: os,library
+      - name: Trivy operations image vulnerability scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: univ-web-operations:supply-chain
+          format: table
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: os,library
+      - name: Upload image SBOMs
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: univ-web-image-sboms
+          path: sbom-*.spdx.json
+          if-no-files-found: error
+          retention-days: 30

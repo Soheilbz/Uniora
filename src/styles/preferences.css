@@ -1,0 +1,138 @@
+/* ────────────────────────────────────────────────────────────────────────────
+ * Display preferences.
+ *
+ * Three attributes on the document element, written by the server before the
+ * first byte of HTML (see `lib/appearance.ts`). Each is a closed list, so every
+ * value below is a rule that exists rather than a template a cookie fills in.
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+/*
+ * The interface's text size.
+ *
+ * Applied to the root font size, so everything measured in `rem` moves with it
+ * — which is the whole interface. A per-component font size would have meant
+ * touching every component and getting a different answer in each.
+ *
+ * Deliberately NOT applied to a printed worksheet: those are measured against
+ * A4 in pixels, and a form whose line breaks moved with a reader's text-size
+ * preference would print differently for every clerk who sent it.
+ */
+:root {
+  font-size: calc(16px * var(--font-scale, 1));
+}
+
+/*
+ * The accent, as the institution's own colour.
+ *
+ * Only `--primary` moves, and that is the point rather than a shortcut: this is
+ * a registry, not a brand exercise, and every additional accent is one more
+ * value that has to hold its contrast against two themes. Each pair below was
+ * picked in OKLCH at a lightness that keeps white text readable on it in light
+ * mode and the same hue legible in dark.
+ */
+:root[data-brand="blue"] {
+  --primary: oklch(0.51 0.17 258);
+  --primary-foreground: oklch(0.985 0 0);
+}
+
+:root[data-brand="teal"] {
+  --primary: oklch(0.5 0.1 195);
+  --primary-foreground: oklch(0.985 0 0);
+}
+
+:root[data-brand="violet"] {
+  --primary: oklch(0.5 0.19 295);
+  --primary-foreground: oklch(0.985 0 0);
+}
+
+:root[data-brand="rose"] {
+  --primary: oklch(0.52 0.19 15);
+  --primary-foreground: oklch(0.985 0 0);
+}
+
+:root[data-brand="amber"] {
+  --primary: oklch(0.58 0.14 70);
+  --primary-foreground: oklch(0.985 0 0);
+}
+
+/*
+ * In dark mode the same hues are lifted and the text on them darkened.
+ *
+ * A brand colour chosen for white text on a light page is not readable as a
+ * button in a dark one — it sits at almost the same lightness as the surface
+ * behind it. These are the same six hues at the lightness dark mode needs.
+ */
+.dark:root[data-brand="blue"] {
+  --primary: oklch(0.72 0.14 258);
+  --primary-foreground: oklch(0.18 0.02 258);
+}
+
+.dark:root[data-brand="teal"] {
+  --primary: oklch(0.75 0.09 195);
+  --primary-foreground: oklch(0.18 0.02 195);
+}
+
+.dark:root[data-brand="violet"] {
+  --primary: oklch(0.72 0.14 295);
+  --primary-foreground: oklch(0.18 0.02 295);
+}
+
+.dark:root[data-brand="rose"] {
+  --primary: oklch(0.72 0.14 15);
+  --primary-foreground: oklch(0.18 0.02 15);
+}
+
+.dark:root[data-brand="amber"] {
+  --primary: oklch(0.79 0.12 70);
+  --primary-foreground: oklch(0.18 0.02 70);
+}
+
+/*
+ * Compact: more rows on a screen, at the cost of air.
+ *
+ * The registers are what this is for — a counter clerk comparing forty students
+ * scrolls less. It reaches table cells and the register toolbar and stops
+ * there: shrinking form fields as well would put a national identity number in
+ * a box too small to check, and the density control is about how much fits, not
+ * about how carefully anybody reads.
+ *
+ * The print rules are untouched by it for the same reason the font scale is: a
+ * filed document is not a screen.
+ */
+:root[data-density="compact"] [data-slot="table-cell"],
+:root[data-density="compact"] [data-slot="table-head"] {
+  padding-block: 0.3rem;
+}
+
+:root[data-density="compact"] [data-slot="table"] {
+  font-size: 0.8125rem;
+}
+
+/*
+ * A settings row is sized by its card, not by the browser viewport.
+ *
+ * The settings rail consumes a fixed measure on desktop, so a two-column card
+ * can be only 20rem wide even when the window is 1280px. A viewport breakpoint
+ * cannot see that and leaves a label fighting a control on the same line. The
+ * row is its own query container: below 40rem the control gets a clean line of
+ * its own, while wider cards keep the compact label/control rhythm.
+ */
+[data-setting-row] {
+  container-type: inline-size;
+}
+
+@container (max-width: 40rem) {
+  [data-setting-row]:not([data-setting-stacked]) {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+  }
+
+  [data-setting-row]:not([data-setting-stacked]) > [data-setting-control] {
+    width: 100%;
+  }
+
+  [data-setting-row] > [data-setting-control] > * {
+    max-width: 100%;
+  }
+}

@@ -1,0 +1,29 @@
+/* biome-ignore-all lint/complexity/noImportantStyles: print/reduced-motion rules intentionally override utility-authored declarations. */
+/* Keep the final two metric rows borderless on the two-column report grid.
+ * This is written as ordinary CSS rather than a generated arbitrary Tailwind
+ * variant so the development PostCSS pipeline cannot misparse the selector. */
+@media (min-width: 640px) {
+  .report-metric-row:nth-last-child(-n + 2) {
+    border-bottom-width: 0;
+  }
+}
+
+/*
+ * Reduced motion, globally.
+ *
+ * Zeroing durations only reaches what opts into them; `animate-spin`,
+ * `animate-pulse` and any keyframes carry their own. `animation: none` also
+ * lets a closing overlay finish immediately rather than waiting out decorative
+ * motion — and a zero-length animation is not reliably a zero-length
+ * `animationend`.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,18 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "../styles/base.css";
+@import "../styles/preferences.css";
+@import "../styles/paper-foundation.css";
+@import "../styles/worksheet-elements.css";
+@import "../styles/worksheet-workspace.css";
+@import "../styles/auth.css";
+@import "../styles/accessibility.css";
+@import "../styles/print-foundation.css";
+@import "../styles/print-worksheets.css";
+@import "../styles/print-council.css";
+
+/* Generated/browser artifacts are not UI sources for Tailwind. */
+@source not "../../e2e";
+@source not "../../.univ";
+@source not "../../.next*";

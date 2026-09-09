@@ -1,0 +1,1 @@
+-- Schema snapshot synchronized with the hand-written 0021 shared rate-limit migration.

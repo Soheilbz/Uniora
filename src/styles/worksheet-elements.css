@@ -1,0 +1,455 @@
+/*
+ * Where a page may be cut, declared outside `@media print`.
+ *
+ * They do nothing to screen layout and they are print declarations, but a
+ * preview that cannot read them disagrees with the printer about every heading
+ * and every row. One declaration, read by both.
+ */
+.worksheet tr,
+.worksheet li {
+  break-inside: avoid;
+}
+
+.worksheet h2,
+.worksheet h3,
+.worksheet h4,
+.worksheet thead {
+  break-after: avoid;
+}
+
+/* The document-control footer belongs at the foot of the last sheet. */
+.worksheet footer {
+  break-before: avoid;
+}
+
+/* Figures inside a form are Persian and set on one width, so a column of marks
+   lines up. */
+.worksheet .ws-num {
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Flex, not a grid of named columns.
+ *
+ * The band holds two or three children depending on whether the institution has
+ * uploaded a crest, and a three-column grid puts a two-child header in the
+ * wrong columns: the reference block lands where the titles belong and the
+ * inline end is empty. The titles take the slack; the crest and the reference
+ * block are as wide as they need to be.
+ */
+.ws-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1.5px solid var(--border);
+  padding-bottom: 5px;
+  margin-bottom: 8px;
+}
+
+/*
+ * The arms, at the head of the sheet.
+ *
+ * Sized by height rather than width, because the emblem is taller than it is
+ * wide and the band it sits in is what must not move: these forms are measured
+ * to the millimetre against one A4 page and the defence permit has about 4mm to
+ * spare. 13mm keeps the crest inside the height the two lines of institution
+ * name already occupy, so it costs the sheet nothing.
+ */
+.ws-head-logo {
+  height: 13mm;
+  width: auto;
+  flex: none;
+  object-fit: contain;
+}
+
+.ws-head-titles {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+.ws-head-org {
+  font-size: 0.82em;
+  font-weight: 600;
+}
+
+.ws-head-faculty {
+  font-size: 0.74em;
+  color: var(--muted-foreground);
+}
+
+.ws-head-name {
+  font-size: 1.05em;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ws-head-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 0.72em;
+  color: var(--muted-foreground);
+}
+
+.ws-head-meta > div {
+  display: flex;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+/* The notice head: its heading and the degree beneath it, centred. */
+.ws-head-notice {
+  display: block;
+  text-align: center;
+}
+
+.ws-notice-title {
+  font-size: 1.6em;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.ws-notice-subtitle {
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  margin-top: 2px;
+}
+
+.ws-head-registration {
+  text-align: start;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.ws-head-minute {
+  justify-content: space-between;
+  min-height: 13mm;
+}
+
+.ws-head-minute .ws-head-logo {
+  order: 2;
+}
+
+.ws-head-minute .ws-head-registration {
+  order: 1;
+  flex: 1;
+}
+
+.ws-section {
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 5px 8px;
+  margin-bottom: 6px;
+  /* A section is a numbered part of a form that somebody signs. Split across
+     two sheets, its heading and its signature box end up on different pages —
+     which is a page that cannot be filed. Declared here rather than in the
+     list above so this one selector is not both scoped and unscoped. */
+  break-inside: avoid;
+}
+
+.ws-section-title {
+  font-size: 0.92em;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+.ws-p {
+  font-size: 0.9em;
+  line-height: 1.5;
+  margin: 4px 0;
+  text-align: justify;
+  text-align-last: start;
+}
+
+.ws-note {
+  font-size: 0.76em;
+  color: var(--muted-foreground);
+  margin: 4px 0;
+}
+
+.ws-fields {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px 10px;
+  margin: 5px 0 4px;
+}
+
+.ws-field {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-size: 0.82em;
+}
+
+.ws-field-wide {
+  grid-column: 1 / -1;
+}
+
+.ws-field dt {
+  flex: none;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+
+.ws-field dd {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  border-bottom: 1px dotted var(--border-subtle);
+}
+
+/*
+ * One outcome to a line, which is how the paper rules them.
+ *
+ * A row saves vertical space and costs the section its meaning: «موافقت گردید.»
+ * runs straight into «موافقت نگردید.» with a tick-box between them, and three
+ * verdicts — one a full sentence with a deadline inside it — arrive as a single
+ * paragraph of alternatives. Which box is ticked is the entire content here.
+ */
+.ws-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 4px 0;
+  font-size: 0.82em;
+  line-height: 1.35;
+}
+
+.ws-choices-label {
+  color: var(--muted-foreground);
+}
+
+.ws-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.3rem;
+}
+
+.worksheet-article-verification .ws-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 8px;
+  row-gap: 1px;
+}
+
+.worksheet-article-verification .ws-choices-label {
+  grid-column: 1 / -1;
+}
+
+.worksheet-article-verification .ws-choice {
+  min-width: 0;
+}
+
+.ws-box {
+  width: 11px;
+  height: 11px;
+  flex: none;
+  margin-top: 2px;
+  border: 1px solid var(--border-strong);
+  border-radius: 2px;
+}
+
+.ws-decl {
+  margin: 5px 0;
+}
+
+.ws-decl li {
+  display: flex;
+  gap: 0.3rem;
+  font-size: 0.8em;
+  line-height: 1.45;
+  margin-bottom: 4px;
+  text-align: justify;
+  text-align-last: start;
+}
+
+.ws-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 5px 0;
+  font-size: 0.72em;
+}
+
+.ws-table th,
+.ws-table td {
+  border: 1px solid var(--border-subtle);
+  padding: 4px 5px;
+  text-align: start;
+}
+
+.ws-table th {
+  background: var(--surface-hover);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* A cell filled in by hand at the sitting: tall enough to write a name in. */
+.ws-table td:empty {
+  height: 15px;
+}
+
+.ws-col-heading {
+  width: 20%;
+}
+
+.ws-col-mark {
+  width: 15%;
+}
+
+.ws-cell-middle {
+  vertical-align: middle;
+}
+
+.ws-cell-centre {
+  text-align: center;
+}
+
+.ws-total td {
+  font-weight: 700;
+}
+
+.ws-marks {
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  margin-top: 2px;
+}
+
+.ws-rule {
+  flex: 1;
+  min-width: 3rem;
+  border-bottom: 1px dotted var(--border);
+}
+
+/*
+ * A ruled cell, where the register could not answer.
+ *
+ * Every unfilled value on these forms draws a line to write on. An empty cell
+ * is a different statement on a signed instrument — it reads as an answer of
+ * "none" rather than as a blank.
+ */
+.ws-cell-rule {
+  display: block;
+  min-height: 0.9em;
+  min-width: 2.5rem;
+  border-bottom: 1px dotted var(--border);
+}
+
+.ws-blank {
+  margin: 2px 0;
+  font-size: 0.8em;
+  color: var(--muted-foreground);
+}
+
+.ws-blank-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.ws-blank-row > span:first-child {
+  flex: none;
+}
+
+.ws-blank-line {
+  margin-top: 9px;
+  border-bottom: 1px dotted var(--border);
+}
+
+/*
+ * The signature boxes, and the room a hand actually needs.
+ *
+ * `min-height` rather than padding, so the clear space is *below* the last
+ * printed row where the pen goes, and so a box carrying a rank and a faculty is
+ * not made taller still. 15mm is what the tightest sheet allows and it was
+ * measured rather than chosen: the defence permit carries eight of these across
+ * five rows, and at 16mm a doctoral permit — which has an extra clause — prints
+ * as two sheets. Raising it means finding the height elsewhere first, and the
+ * record to check is the worst one, not the first one the list offers.
+ */
+.ws-signs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 4px 7px;
+  margin-top: 5px;
+}
+
+.ws-sign {
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 3px 5px;
+  min-height: 15mm;
+}
+
+.ws-sign-caption {
+  font-size: 0.74em;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--muted-foreground);
+}
+
+.ws-sign-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-size: 0.74em;
+  margin-top: 1px;
+}
+
+.ws-sign-row > span:first-child {
+  flex: none;
+  color: var(--muted-foreground);
+}
+
+/* The bound minute names its countersigning officers in sentences. */
+.ws-sign-inline {
+  font-size: 0.85em;
+  margin: 2px 0;
+}
+
+.ws-roster {
+  margin: 2px 0;
+}
+
+.ws-roster-title {
+  font-size: 0.85em;
+  font-weight: 700;
+  margin-bottom: 1px;
+}
+
+.ws-roster li {
+  font-size: 0.82em;
+  line-height: 1.5;
+}
+
+.ws-grade {
+  font-size: 0.92em;
+  font-weight: 600;
+  text-align: center;
+  margin: 3px 0;
+}
+
+.ws-grade-rule {
+  display: inline-block;
+  width: 8rem;
+  border-bottom: 1px dotted var(--border);
+}
+
+.ws-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 4px;
+  padding-top: 2px;
+  border-top: 1px dashed var(--border-subtle);
+  font-size: 0.72em;
+  color: var(--muted-foreground);
+}
+
+.ws-foot-note {
+  flex: 1;
+  text-align: center;
+}

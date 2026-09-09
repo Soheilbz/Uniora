@@ -1,0 +1,335 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1787412871841,
+      "tag": "0000_initial_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1787413255437,
+      "tag": "0001_account_issuer",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787432164280,
+      "tag": "0002_authorisation",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1787434393847,
+      "tag": "0003_tan_mandroid",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1787434405503,
+      "tag": "0004_hard_sue_storm",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1787434921675,
+      "tag": "0005_loving_scalphunter",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1787440136734,
+      "tag": "0006_flimsy_bug",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1787446787318,
+      "tag": "0007_even_toro",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1787452839159,
+      "tag": "0008_misty_cassandra_nova",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1787453275151,
+      "tag": "0009_free_pixie",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1787460091527,
+      "tag": "0010_clean_spiral",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1787464075785,
+      "tag": "0011_bizarre_bastion",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1787467693961,
+      "tag": "0012_lucky_meteorite",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1787508024260,
+      "tag": "0013_sudden_nick_fury",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1787508024261,
+      "tag": "0014_rank_and_standing_vocabulary",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1787509491658,
+      "tag": "0015_boring_valkyrie",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1787510394202,
+      "tag": "0016_yummy_bushwacker",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1787529719395,
+      "tag": "0017_institution_university",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1787530510222,
+      "tag": "0018_saved_views",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1787567887328,
+      "tag": "0019_perf_indexes",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1787568042955,
+      "tag": "0020_decisions_search",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1787782741802,
+      "tag": "0021_shared_rate_limit",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1787784626035,
+      "tag": "0022_typical_james_howlett",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1787786977033,
+      "tag": "0023_tenant_integrity",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1787788005095,
+      "tag": "0024_tenant_fk_delete_behavior",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1787830000000,
+      "tag": "0025_backup_capability",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1788103968335,
+      "tag": "0026_classy_solo",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1788459296183,
+      "tag": "0027_web_native_hardening",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1788502133500,
+      "tag": "0028_production_hardening",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1788526971175,
+      "tag": "0029_wild_inhumans",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1788532487729,
+      "tag": "0030_careful_red_wolf",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1788532966163,
+      "tag": "0031_yellow_magik",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1788540000000,
+      "tag": "0032_search_surfaces",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1788543600000,
+      "tag": "0033_full_stack_foundations",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1788547200000,
+      "tag": "0034_enterprise_identity_runtime",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1788550800000,
+      "tag": "0035_enterprise_integration_completion",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1788554400000,
+      "tag": "0036_public_release_cleanup",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1788558000000,
+      "tag": "0037_final_release_hardening",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1788635543046,
+      "tag": "0038_administrator_capability_backfill",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1788710000000,
+      "tag": "0040_platform_backup_operations",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1788713600000,
+      "tag": "0041_platform_operation_controls",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1788717200000,
+      "tag": "0042_platform_audit_explorer",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1788720800000,
+      "tag": "0043_sanitize_platform_audit_changes",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1788724400000,
+      "tag": "0044_fix_platform_audit_redaction",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1788731600000,
+      "tag": "0045_data_contract_cleanup",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1788735200000,
+      "tag": "0046_retire_tenant_mfa",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1788738800000,
+      "tag": "0047_better_auth_issuer_compatibility",
+      "breakpoints": true
+    }
+  ]
+}

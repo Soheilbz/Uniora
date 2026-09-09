@@ -1,0 +1,155 @@
+/* biome-ignore-all lint/complexity/noImportantStyles: print rules intentionally override utility-authored declarations. */
+@media print {
+  /* Council papers use the named A4 page margin above. The old 2rem padding
+   * would otherwise be added on top of that printer margin and make the text
+   * column unnecessarily narrow. */
+  .council-sheet {
+    width: 186mm !important;
+    max-width: 186mm !important;
+    min-height: 273mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    font-size: 10pt !important;
+    line-height: 1.55 !important;
+    box-sizing: border-box !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .council-sheet table {
+    border-collapse: collapse !important;
+  }
+
+  .council-sheet thead {
+    display: table-header-group !important;
+  }
+
+  .council-sheet tr,
+  .council-sheet .minutes-resolution,
+  .council-sheet .minutes-attendance {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .council-minutes-sheet {
+    font-family: var(--font-sans) !important;
+    font-size: 10pt !important;
+    line-height: 1.65 !important;
+  }
+
+  .council-minutes-sheet .minutes-heading {
+    padding-bottom: 2.5mm !important;
+    margin-bottom: 2.5mm !important;
+  }
+
+  .council-minutes-sheet .minutes-heading h1 {
+    font-size: 14pt !important;
+    line-height: 1.55 !important;
+  }
+
+  .council-minutes-sheet .minutes-heading p {
+    margin-top: 1mm !important;
+    font-size: 9.5pt !important;
+    line-height: 1.55 !important;
+  }
+
+  .council-minutes-sheet .minutes-details {
+    margin-top: 2mm !important;
+  }
+
+  .council-minutes-sheet .minutes-details .sheet-grid {
+    gap: 1mm 4mm !important;
+    padding-block: 1.5mm !important;
+    font-size: 9.5pt !important;
+    line-height: 1.6 !important;
+  }
+
+  .council-minutes-sheet .minutes-attendance {
+    margin-top: 2.5mm !important;
+    font-size: 9.75pt !important;
+    line-height: 1.7 !important;
+  }
+
+  .council-minutes-sheet .minutes-attendance > div {
+    padding: 2.5mm !important;
+  }
+
+  .council-minutes-sheet .minutes-section {
+    margin-top: 3mm !important;
+  }
+
+  .council-minutes-sheet .minutes-section > h2 {
+    font-size: 11pt !important;
+    line-height: 1.55 !important;
+  }
+
+  .council-minutes-sheet .minutes-section > ol {
+    margin-top: 1.5mm !important;
+  }
+
+  .council-minutes-sheet .minutes-resolution {
+    padding: 2.5mm 3mm !important;
+    font-size: 9.75pt !important;
+    line-height: 1.7 !important;
+  }
+
+  .council-minutes-sheet .minutes-resolution ul {
+    margin-top: 1.5mm !important;
+    font-size: 0.95em !important;
+    line-height: 1.7 !important;
+  }
+
+  .council-minutes-sheet .minutes-table-wrap {
+    overflow: visible !important;
+  }
+
+  .council-minutes-sheet .minutes-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+    font-size: 8.75pt !important;
+    line-height: 1.5 !important;
+  }
+
+  .council-minutes-sheet .minutes-table th,
+  .council-minutes-sheet .minutes-table td {
+    padding: 1.3mm 1.5mm !important;
+    border-color: #777 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .council-minutes-sheet .minutes-heading img {
+    width: 14mm !important;
+    height: 14mm !important;
+    object-fit: contain !important;
+  }
+
+  .council-minutes-sheet .minutes-table th:nth-child(1),
+  .council-minutes-sheet .minutes-table td:nth-child(1) {
+    width: 5%;
+  }
+
+  .council-minutes-sheet .minutes-table th:nth-child(2),
+  .council-minutes-sheet .minutes-table td:nth-child(2) {
+    width: 13%;
+  }
+
+  .council-minutes-sheet .minutes-table th:nth-child(3),
+  .council-minutes-sheet .minutes-table td:nth-child(3) {
+    width: 9%;
+  }
+
+  .council-minutes-sheet .minutes-table th:nth-child(4),
+  .council-minutes-sheet .minutes-table td:nth-child(4) {
+    width: 10%;
+  }
+
+  .council-minutes-sheet .minutes-table th:nth-child(5),
+  .council-minutes-sheet .minutes-table td:nth-child(5) {
+    width: 14%;
+  }
+
+  .council-minutes-sheet .minutes-table th:nth-child(n + 6),
+  .council-minutes-sheet .minutes-table td:nth-child(n + 6) {
+    width: 16.333%;
+  }
+}

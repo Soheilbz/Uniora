@@ -1,0 +1,241 @@
+/*
+ * The preview is the actual paper, scaled to fit its column.
+ *
+ * A document laid out to whatever width the pane happens to be is a different
+ * document: line breaks, page breaks and the signature block all move, so the
+ * only way to see what would come out of the printer would be to print it. The
+ * sheet keeps its 210mm and is scaled down; `.ws-slot` reserves the scaled
+ * footprint, which a transform does not do on its own.
+ */
+.ws-frame {
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: #d4d4d4;
+  padding: 1rem;
+}
+
+/* The worksheet picker is a fixed-height workbench on wide screens. The two
+ * catalogues and the A4 viewport share that height; only their own lists/paper
+ * scroll, never the shell page. On a narrow screen normal page flow is kept so
+ * the controls remain reachable with a touch gesture. */
+@media (min-width: 1024px) {
+  #main-content:has(.worksheet-page) {
+    overflow: hidden;
+  }
+
+  .worksheet-page {
+    padding-bottom: 0;
+  }
+
+  .worksheet-workspace {
+    height: calc(100svh - 10.5rem);
+  }
+
+  .worksheet-panel,
+  .worksheet-empty {
+    height: 100%;
+    max-height: 100%;
+    /* biome-ignore lint/complexity/noImportantStyles: grid sizing must override the shell's intrinsic minimum. */
+    min-height: 0 !important;
+  }
+
+  .worksheet-preview-column {
+    height: 100%;
+  }
+
+  .worksheet-preview-scroll {
+    flex: 1 1 0%;
+    min-height: 0;
+  }
+}
+
+.ws-slot {
+  width: calc(210mm * var(--ws-scale));
+  height: calc(297mm * var(--ws-scale));
+  margin-inline: auto;
+}
+
+.worksheet-print-route {
+  min-height: 100svh;
+  overflow: auto;
+  background: #d4d4d4;
+  padding: 1rem;
+}
+
+.worksheet-print-route > .worksheet {
+  box-shadow: 0 1px 6px rgb(0 0 0 / 0.25);
+}
+
+/* The standalone print link is a document workspace, not another app screen.
+ * Remove the shell around it so the browser preview matches the paper that the
+ * print dialog receives. The print media rules below still remove the preview
+ * background and shadow. */
+body:has(.worksheet-print-route) [data-slot="sidebar"],
+body:has(.worksheet-print-route) [data-slot="sidebar-gap"],
+body:has(.worksheet-print-route) [data-print-hide] {
+  /* biome-ignore lint/complexity/noImportantStyles: print mode must hide shell chrome. */
+  display: none !important;
+}
+
+body:has(.worksheet-print-route) #main-content {
+  overflow: auto;
+  padding: 1rem;
+}
+
+body:has(.worksheet-print-route) [data-slot="sidebar-inset"] {
+  margin: 0;
+}
+
+.ws-slot > .worksheet {
+  transform: scale(var(--ws-scale));
+  transform-origin: top right;
+  box-shadow: 0 1px 6px rgb(0 0 0 / 0.25);
+}
+
+/*
+ * The identity rungs as classes.
+ *
+ * Classes rather than Tailwind utilities because the pair — a background with
+ * its matched foreground — must never be split: a rung is one unit, not two
+ * independent choices, and a chip drawn with rung 3's background and rung 5's
+ * text is a contrast ratio nobody measured.
+ */
+.ui-category-1 {
+  background: var(--category-1);
+  color: var(--category-1-foreground);
+}
+.ui-category-2 {
+  background: var(--category-2);
+  color: var(--category-2-foreground);
+}
+.ui-category-3 {
+  background: var(--category-3);
+  color: var(--category-3-foreground);
+}
+.ui-category-4 {
+  background: var(--category-4);
+  color: var(--category-4-foreground);
+}
+.ui-category-5 {
+  background: var(--category-5);
+  color: var(--category-5-foreground);
+}
+.ui-category-6 {
+  background: var(--category-6);
+  color: var(--category-6-foreground);
+}
+.ui-category-7 {
+  background: var(--category-7);
+  color: var(--category-7-foreground);
+}
+.ui-category-8 {
+  background: var(--category-8);
+  color: var(--category-8-foreground);
+}
+
+/*
+ * The state chips, paired the same way.
+ *
+ * These four mean something — present against absent, business against none —
+ * so unlike the ramp above they are chosen by what the value *is*. Each carries
+ * its own border, because on a printed register the fill is dropped and the
+ * outline is all that is left to separate a chip from the cell around it.
+ */
+.ui-state-success {
+  background: var(--success-subtle);
+  color: var(--success-subtle-foreground);
+  border-color: var(--success-subtle-border);
+}
+.ui-state-warning {
+  background: var(--warning-subtle);
+  color: var(--warning-subtle-foreground);
+  border-color: var(--warning-subtle-border);
+}
+.ui-state-danger {
+  background: var(--danger-subtle);
+  color: var(--danger-subtle-foreground);
+  border-color: var(--danger-subtle-border);
+}
+.ui-state-info {
+  background: var(--info-subtle);
+  color: var(--info-subtle-foreground);
+  border-color: var(--info-subtle-border);
+}
+
+/*
+ * Column bands, for the tables that are mostly numbers.
+ *
+ * The reviews table sets six adjacent counts in one style and the office reads
+ * it all day: with nothing between «کارشناسی ارشد» and «دکتری عمومی» but a gap,
+ * the eye loses which column a figure sits under. It is worse in Persian than
+ * it would be in English, because the reader scans right-to-left while each
+ * numeral group renders left-to-right, so there is no single direction the eye
+ * can commit to.
+ *
+ * The tint marks the *group*, not the column: a reader who has learnt the two
+ * bands has learnt something true about the table — that the graduate-studies
+ * representative is not inside «تعداد داوری» and must not be added to it.
+ *
+ *  - `breakdown` — the figures that add up to the table's headline total.
+ *  - `aside`     — figures that total does not contain.
+ *
+ * The headline total is left untinted and set in `font-medium`: it is the
+ * answer rather than one of the parts, and weight says so without a third tint.
+ *
+ * Colour is never the only signal. The rule opens every band and closes it
+ * again, so the grouping survives a reader who cannot separate the tints, a
+ * monochrome screen, and paper — where the fills are dropped and the rules stay
+ * in ink.
+ */
+[data-band],
+[data-band] + :not([data-band]) {
+  border-inline-start: 1px solid var(--border);
+}
+
+td[data-band="breakdown"] {
+  background-color: color-mix(in oklab, var(--muted) 70%, transparent);
+}
+
+td[data-band="aside"] {
+  background-color: color-mix(in oklab, var(--primary) 5%, transparent);
+}
+
+/* A run of one band is one block, not one rule per column. */
+[data-band="breakdown"] + [data-band="breakdown"],
+[data-band="aside"] + [data-band="aside"] {
+  border-inline-start: 0;
+}
+
+.dark td[data-band="aside"] {
+  background-color: color-mix(in oklab, var(--primary) 18%, transparent);
+}
+
+@media print {
+  .worksheet-print-route {
+    /* biome-ignore lint/complexity/noImportantStyles: print layout must override screen constraints. */
+    min-height: 0 !important;
+    /* biome-ignore lint/complexity/noImportantStyles: print layout must override screen constraints. */
+    overflow: visible !important;
+    /* biome-ignore lint/complexity/noImportantStyles: print layout must override screen constraints. */
+    padding: 0 !important;
+    /* biome-ignore lint/complexity/noImportantStyles: print layout must override screen constraints. */
+    background: #fff !important;
+  }
+
+  /* A dark-theme `--muted` prints as a block that swallows the numerals. */
+  td[data-band] {
+    background-color: transparent;
+  }
+}
+
+/*
+ * Justified prose, only where prose earns it: several lines over a comfortable
+ * measure. Never on a label, button, badge, table cell or one-line hint —
+ * justification never touches the last line of a block, so on a single-line
+ * block it does nothing except drop it back to `start`.
+ */
+.prose-justify {
+  text-align: justify;
+  text-justify: auto;
+}

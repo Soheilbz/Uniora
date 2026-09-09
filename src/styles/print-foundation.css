@@ -1,0 +1,211 @@
+/* biome-ignore-all lint/complexity/noImportantStyles: print/reduced-motion rules intentionally override utility-authored declarations. */
+/*
+ * Worksheet-specific print geometry. This intentionally lives after the
+ * shared worksheet rules so the print selectors win without relying on
+ * specificity tricks. The preview and the printer therefore use the same
+ * physical A4 canvas, while each document keeps its own density and rhythm.
+ */
+@media print {
+  .worksheet-defense-minutes {
+    padding: 12mm 14mm 10mm !important;
+    font-size: 15px !important;
+    line-height: 1.75 !important;
+  }
+
+  .worksheet-defense-minutes .ws-section,
+  .worksheet-originality-declaration .ws-section {
+    border-color: #c7c7c7 !important;
+    background: #fff !important;
+  }
+
+  .worksheet-defense-minutes .ws-section {
+    border: 0 !important;
+    padding: 0 !important;
+    margin-bottom: 3mm !important;
+  }
+
+  .worksheet-defense-minutes .ws-head-minute {
+    margin-bottom: 5mm !important;
+    padding-bottom: 2mm !important;
+  }
+
+  .worksheet-defense-minutes .ws-p {
+    font-size: 1em !important;
+    line-height: 1.75 !important;
+    text-align: justify !important;
+  }
+
+  .worksheet-defense-minutes .ws-roster-title {
+    margin-top: 2mm !important;
+    font-size: 0.95em !important;
+  }
+
+  .worksheet-defense-minutes .ws-roster li,
+  .worksheet-defense-minutes .ws-sign-inline {
+    line-height: 1.7 !important;
+  }
+
+  .worksheet-originality-declaration {
+    padding: 9mm 10mm 11mm !important;
+    font-size: 11.5px !important;
+    line-height: 1.45 !important;
+  }
+
+  .worksheet-originality-declaration .ws-section {
+    border: 0 !important;
+    padding: 2.5mm 2mm !important;
+    margin-bottom: 4mm !important;
+  }
+
+  .worksheet-originality-declaration .ws-decl li {
+    line-height: 1.5 !important;
+    margin-bottom: 2.5mm !important;
+  }
+
+  .worksheet-originality-declaration .ws-signs {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 3mm !important;
+  }
+
+  .worksheet-originality-declaration .ws-sign {
+    min-height: 25mm !important;
+    border-color: #bdbdbd !important;
+    background: #fff !important;
+  }
+
+  /* Backgrounds and rules must survive the browser's "print backgrounds"
+     preference. The foreground is kept dark enough for monochrome printers. */
+  .worksheet .ws-head,
+  .worksheet .ws-table th,
+  .worksheet .ws-sign,
+  .worksheet .ws-section {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .worksheet .ws-table {
+    table-layout: fixed !important;
+  }
+
+  .worksheet .ws-table th,
+  .worksheet .ws-table td {
+    border-color: #9a9a9a !important;
+    overflow-wrap: anywhere !important;
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * Print production pass — A4 worksheets + Nastaliq minutes.
+ *
+ * These rules are intentionally physical-unit based. The administrative text
+ * is untouched; only page geometry, typography, fragmentation and print asset
+ * fidelity are controlled here.
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+@page council-paper {
+  size: A4 portrait;
+  margin: 11mm 12mm 13mm;
+}
+
+.council-sheet {
+  page: council-paper;
+  text-rendering: optimizeLegibility;
+  font-size: 10pt;
+  line-height: 1.55;
+}
+
+/* The bound final-defence minute uses a bundled, self-hosted Nastaliq face.
+ * Research-council minutes intentionally stay in the application's regular
+ * Vazirmatn document face for denser, more conventional administrative print. */
+.worksheet-defense-minutes {
+  font-family:
+    "Noto Nastaliq Urdu", "IranNastaliq", "Iran Nastaliq", "Nastaleeq", "Nastaliq", serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+.council-minutes-sheet {
+  font-family: var(--font-sans);
+  font-size: 10pt;
+  line-height: 1.65;
+}
+
+.council-minutes-sheet .minutes-heading h1 {
+  font-size: 14pt;
+  line-height: 1.55;
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+.council-minutes-sheet .minutes-heading p {
+  font-size: 9.5pt;
+  line-height: 1.55;
+}
+
+.council-minutes-sheet .minutes-details .sheet-grid {
+  font-size: 9.5pt;
+  line-height: 1.6;
+}
+
+.council-minutes-sheet .minutes-attendance,
+.council-minutes-sheet .minutes-resolution {
+  font-size: 9.75pt;
+  line-height: 1.7;
+}
+
+.council-minutes-sheet .minutes-section > h2 {
+  font-size: 11pt;
+  line-height: 1.55;
+}
+
+.council-minutes-sheet .minutes-resolution {
+  text-align: justify;
+  text-align-last: start;
+}
+
+.council-minutes-sheet .minutes-resolution ul {
+  font-size: 0.95em;
+  line-height: 1.7;
+}
+
+.council-minutes-sheet .minutes-table {
+  table-layout: fixed;
+  font-size: 8.75pt;
+  line-height: 1.5;
+}
+
+.council-minutes-sheet .minutes-table th,
+.council-minutes-sheet .minutes-table td {
+  overflow-wrap: anywhere;
+  vertical-align: middle;
+}
+
+.worksheet {
+  text-rendering: optimizeLegibility;
+}
+
+.worksheet .ws-head-name,
+.worksheet .ws-section-title,
+.worksheet .ws-notice-title {
+  text-wrap: balance;
+}
+
+.worksheet .ws-p,
+.worksheet .ws-note,
+.worksheet .ws-field dd,
+.worksheet .ws-decl li,
+.worksheet .ws-table th,
+.worksheet .ws-table td,
+.worksheet .ws-sign-row,
+.worksheet .ws-roster li {
+  overflow-wrap: anywhere;
+}
+
+.worksheet .ws-sign,
+.worksheet .ws-signs,
+.worksheet .ws-grade,
+.worksheet .ws-roster,
+.worksheet .ws-blank-row {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}

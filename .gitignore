@@ -1,0 +1,35 @@
+# Local secrets and operator credentials
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Generated application, database and test state
+node_modules/
+.next/
+.next-dev/
+.next-release/
+.univ/
+.runtime-closures/
+.tmp/
+releases/
+coverage/
+backups/
+exports/
+audit-seals/
+dr-reports/
+e2e/.auth/
+e2e/.state.json
+e2e/.run-*/
+playwright-report/
+test-results/
+
+# Local archives and logs
+*.log
+*.zip
+*.zip.sha256
+*.dump
+*.dump.enc
+*.dump.enc.json
+*.sig
+*.pem

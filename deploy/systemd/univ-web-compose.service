@@ -1,0 +1,22 @@
+[Unit]
+Description=Univ Web container stack
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/univ-web/current
+EnvironmentFile=-/etc/univ-web/stack.env
+ExecStartPre=/bin/bash deploy/host-preflight.sh
+ExecStartPre=/usr/bin/docker compose -f deploy/compose.production.yml config --quiet
+ExecStart=/usr/bin/docker compose -f deploy/compose.production.yml up -d --no-build --remove-orphans --wait --wait-timeout 120
+ExecReload=/usr/bin/docker compose -f deploy/compose.production.yml up -d --no-build --remove-orphans --wait --wait-timeout 120
+ExecStop=/usr/bin/docker compose -f deploy/compose.production.yml down
+TimeoutStartSec=180
+TimeoutStopSec=90
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target

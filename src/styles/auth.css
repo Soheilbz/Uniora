@@ -1,0 +1,206 @@
+/*
+ * Sign-in editorial palette.
+ *
+ * The authenticated application keeps the neutral system palette above. The
+ * entry screen gets its own restrained paper-and-ink language so it can feel
+ * like an institutional front door without turning the whole product brown.
+ * The variables also keep the light and dark versions as one deliberate pair.
+ */
+.login-page {
+  --login-paper: #f7f2e9;
+  --login-paper-deep: #ede4d6;
+  --login-card: #fffdf8;
+  --login-card-border: #d9ccbc;
+  --login-ink: #292521;
+  --login-ink-soft: #554b42;
+  --login-showcase-bg: #292521;
+  --login-showcase-paper: #f7f2e9;
+  --login-clay: #b95f38;
+  --login-clay-light: #e3a184;
+  --login-showcase-muted: rgb(247 242 233 / 68%);
+  --login-showcase-line: rgb(247 242 233 / 16%);
+  background: var(--login-paper);
+  color: var(--login-ink);
+}
+
+.dark .login-page {
+  --login-paper: #1d1a17;
+  --login-paper-deep: #29231e;
+  --login-card: #26211d;
+  --login-card-border: #4a3f35;
+  --login-ink: #f7f2e9;
+  --login-ink-soft: #d2c4b5;
+  --login-showcase-bg: #141210;
+  --login-showcase-paper: #f7f2e9;
+  --login-clay: #d27a50;
+  --login-clay-light: #e6a587;
+  --login-showcase-muted: rgb(247 242 233 / 68%);
+  --login-showcase-line: rgb(247 242 233 / 16%);
+}
+
+.login-main {
+  background: var(--login-paper);
+}
+
+.login-card {
+  border: 1px solid var(--login-card-border);
+  background: var(--login-card);
+  box-shadow: 0 18px 45px rgb(71 53 36 / 10%);
+}
+
+/* The sign-in card contains a short helper line below each credential. Keep
+   those lines readable while avoiding the cumulative height of the generic
+   form rhythm, which is intentionally roomier elsewhere in the application. */
+.login-form [data-slot="field-description"] {
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.login-form [data-slot="field-label"] {
+  font-size: 0.875rem;
+}
+
+@media (max-height: 820px) and (min-width: 1024px) {
+  .login-main {
+    padding-block: 1.25rem;
+  }
+
+  .login-card-header {
+    padding-block: 1rem;
+  }
+
+  .login-card-content {
+    padding-block: 0.875rem;
+  }
+}
+
+.dark .login-card {
+  box-shadow: 0 18px 45px rgb(0 0 0 / 22%);
+}
+
+.login-crest {
+  border-color: var(--login-card-border);
+  background: var(--login-card);
+}
+
+.login-mark,
+.login-showcase-mark {
+  background: var(--login-clay);
+}
+
+.login-mark {
+  color: var(--login-card);
+}
+
+.login-showcase-mark {
+  color: var(--login-showcase-paper);
+}
+
+.login-eyebrow {
+  color: var(--login-clay);
+}
+
+.login-security {
+  color: var(--login-ink-soft);
+}
+
+.login-security svg {
+  color: var(--login-clay);
+}
+
+.login-input-group {
+  height: 3rem;
+  border-color: var(--login-card-border);
+  background: var(--login-card);
+  box-shadow: none;
+}
+
+.login-input-group:has([data-slot="input-group-control"]:focus-visible) {
+  border-color: var(--login-clay);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--login-clay) 16%, transparent);
+}
+
+/* Chromium paints saved credentials with a blue system fill. That fill is
+   useful in a generic form, but it breaks the paper-and-ink login surface and
+   makes the field look focused when it is not. Keep the browser's autofill
+   behaviour while making its paint use the login tokens in both themes. */
+.login-input-group input:-webkit-autofill,
+.login-input-group input:-webkit-autofill:hover,
+.login-input-group input:-webkit-autofill:focus,
+.login-input-group input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--login-ink);
+  -webkit-box-shadow: 0 0 0 1000px var(--login-card) inset;
+  box-shadow: 0 0 0 1000px var(--login-card) inset;
+  caret-color: var(--login-ink);
+  transition: background-color 9999s ease-out 0s;
+}
+
+.login-input-group [data-slot="input-group-addon"] {
+  color: var(--login-ink-soft);
+}
+
+.login-submit-button {
+  background: var(--login-ink);
+  color: var(--login-paper);
+}
+
+.login-submit-button:hover {
+  background: var(--login-ink-soft);
+}
+
+.login-submit-button:focus-visible {
+  border-color: var(--login-clay);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--login-clay) 22%, transparent);
+}
+
+.login-showcase {
+  position: relative;
+  isolation: isolate;
+  background: var(--login-showcase-bg);
+  color: var(--login-showcase-paper);
+}
+
+.login-showcase::before,
+.login-showcase::after {
+  position: absolute;
+  z-index: -1;
+  border: 1px solid var(--login-showcase-line);
+  border-radius: 9999px;
+  content: "";
+  pointer-events: none;
+}
+
+.login-showcase::before {
+  inset: auto -14rem -18rem auto;
+  width: 34rem;
+  height: 34rem;
+}
+
+.login-showcase::after {
+  inset: -18rem auto auto -20rem;
+  width: 38rem;
+  height: 38rem;
+}
+
+.login-showcase-rule {
+  position: absolute;
+  inset-block: 2.5rem;
+  inset-inline-start: 2.5rem;
+  width: 1px;
+  background: var(--login-showcase-line);
+}
+
+.login-showcase-index {
+  color: var(--login-clay-light);
+}
+
+.login-showcase-icon {
+  border: 1px solid var(--login-showcase-line);
+  color: var(--login-clay-light);
+}
+
+@media (max-width: 1023px) {
+  .login-main {
+    min-height: 100svh;
+  }
+}

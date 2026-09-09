@@ -1,0 +1,23 @@
+{
+  "name": "pnpm",
+  "version": "11.21.0",
+  "source": {
+    "registry": "https://registry.npmjs.org/pnpm/-/pnpm-11.21.0.tgz",
+    "integrity": "sha512-UhcFvOaJkk6scvWjWHEi82JonvZXHlW6gAdv1jfBETLs/62ib61Op5xIW/3b/T1aKlsFgFp36JPeceyKbMo7sQ==",
+    "shasum": "596bef0a53c8692c4bef9c9e5889ee4ba704a4c3",
+    "fileCount": 891,
+    "unpackedSize": 36789264,
+    "signature": {
+      "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+      "sig": "MEYCIQDdn6aNm8C/qEga168q3oLGhCvQiX2NvwetnnJRY+7FxQIhAMf2AP25oWcjnlBxN8UmQEenGEdil1tJK4IUjiEOeWnj"
+    },
+    "provenance": "https://registry.npmjs.org/-/npm/v1/attestations/pnpm@11.21.0"
+  },
+  "runtimeFiles": {
+    "bin/pnpm.mjs": "ff3224d46b47fbb24a7e9fe15fededef7e00892d07d4e376b6762d4899906bfd",
+    "dist/pnpm.mjs": "293dcced3c77f5a633352076fe4c9a768e60c6992ed58bc695b465f839fe9615",
+    "dist/pnpmrc": "6985e6e532eed7e6fd69a7d560ac5a5753d74a9f9709627092d5be02afddd84e",
+    "dist/worker.js": "1f657e33bd8f3b0cc5b54d7d1c4db356fe76db61665126803394a2c16c78a4cb",
+    "package.json": "d0ffe394c8507f627cca00d09c690467efd8138e78474330631c3b200aa2c56f"
+  }
+}

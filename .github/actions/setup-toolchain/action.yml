@@ -1,0 +1,29 @@
+name: Univ Web toolchain
+description: Set up the pinned Node.js, vendored pnpm runtime, and repository-local pnpm cache.
+
+runs:
+  using: composite
+  steps:
+    - name: Use the repository Node.js pin
+      uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version-file: .node-version
+
+    - name: Install the vendored pnpm runtime
+      shell: bash
+      run: |
+        set -euo pipefail
+        pnpm_version="$(node -p "require('./package.json').packageManager.replace(/^pnpm@/, '')")"
+        mkdir -p "$RUNNER_TEMP/univ-pnpm/bin"
+        ln -sf "$GITHUB_WORKSPACE/toolchain/pnpm/$pnpm_version/bin/pnpm.mjs" "$RUNNER_TEMP/univ-pnpm/bin/pnpm"
+        echo "$RUNNER_TEMP/univ-pnpm/bin" >> "$GITHUB_PATH"
+        node --version
+        pnpm --version
+
+    - name: Restore pnpm store
+      uses: actions/cache@3edfce9056124e459a23f683a21433670d47daca # v6.1.0
+      with:
+        path: .univ/cache/pnpm-store
+        key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+        restore-keys: |
+          pnpm-store-${{ runner.os }}-

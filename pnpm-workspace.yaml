@@ -1,0 +1,54 @@
+# A single-package workspace keeps pnpm settings scoped to this repository.
+packages:
+  - "."
+
+# The pnpm store lives inside this folder so bootstrap and CI use an explicit,
+# repository-scoped cache rather than an accidental machine-global store.
+storeDir: .univ/cache/pnpm-store
+
+# The production image is pinned to Linux/amd64 Alpine. Materialize both
+# Linux libc variants during the verified host install so Docker never needs
+# to fetch optional native packages while building the image.
+supportedArchitectures:
+  os:
+    - linux
+  cpu:
+    - x64
+  libc:
+    - glibc
+    - musl
+
+# Rebuilding `node_modules` from scratch is a normal step here — the store is
+# local, so it costs seconds — and there is no terminal to confirm at when the
+# install runs from a script.
+confirmModulesPurge: false
+
+# ── Security overrides ──────────────────────────────────────────────────────
+# drizzle-kit resolves a transitive @esbuild-kit chain pinned to esbuild
+# 0.18 (GHSA-67mh-4wv8-2f99: the esbuild dev server serves requests to any
+# origin). Nothing in that chain runs a dev server here — drizzle-kit only
+# migrates — but a known-vulnerable version in the tree is a finding waiting
+# for the next audit, so the range is lifted to the patched line. Scoped to
+# the vulnerable range: vitest's own esbuild is current and untouched.
+overrides:
+  'esbuild@<0.24.3': '>=0.24.3'
+
+# ── Build scripts ───────────────────────────────────────────────────────────
+# A postinstall script is arbitrary code from the registry running on a machine
+# that holds a university's records, so pnpm refuses them all by default and
+# this list is the exception. Only packages whose script places a platform
+# binary this project actually executes are named:
+#
+#   @swc/core  — the transform vitest uses
+#   esbuild    — bundling for drizzle-kit and vitest
+#
+# @parcel/watcher is deliberately absent: it is a file-watching optimisation,
+# and the pure-JS fallback is correct.
+allowBuilds:
+  # A file-watching optimisation. The pure-JS fallback is correct, and this is
+  # native code running at install time for a convenience.
+  '@parcel/watcher': false
+  # Places the platform binary vitest's transform runs.
+  '@swc/core': true
+  # Places the platform binary drizzle-kit and vitest bundle with.
+  esbuild: true

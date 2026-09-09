@@ -1,0 +1,103 @@
+{
+  "policyVersion": 1,
+  "migrations": {
+    "0033_full_stack_foundations": {
+      "additive": true,
+      "estimatedLockRisk": "medium",
+      "backwardCompatible": true,
+      "notes": "Large additive platform-foundation migration; table creation, backfills, indexes and capability grants must be timed on a production clone.",
+      "rollback": "Restore from a verified backup or remove only newly created foundation objects after confirming no writes occurred. Published official-record revisions must never be rewritten in place."
+    },
+    "0034_enterprise_identity_runtime": {
+      "additive": true,
+      "estimatedLockRisk": "low",
+      "backwardCompatible": true,
+      "notes": "Adds enterprise identity provider/link runtime objects and narrow SECURITY DEFINER pre-auth resolvers. Better Auth plugin schema remains subject to official CLI reconciliation before activation.",
+      "rollback": "Disable enterprise identity connections, remove provider materialization/resolvers, then drop identity runtime objects only if no external identity has been activated."
+    },
+    "0035_enterprise_integration_completion": {
+      "additive": true,
+      "estimatedLockRisk": "medium",
+      "backwardCompatible": true,
+      "notes": "Completes SCIM credential control-plane, durable SIS/HR/LDAPS sync staging, composite tenant/job/run integrity, object-storage-backed resumable workshop imports, and system-owned durable outbox dispatch by allowing nullable requester only on the shared jobs table. Better Auth plugin-owned schema must be reconciled from the official 1.7.2 generator before enterprise-auth activation.",
+      "rollback": "Disable SCIM and external sync connections, revoke SCIM tokens, stop tenant workers, drain or pause system outbox dispatch, cancel/expire unfinished import batches, verify staged records are not being reconciled, then remove only 0035 application-owned objects. Do not drop Better Auth plugin-owned tables through this rollback path."
+    },
+    "0036_public_release_cleanup": {
+      "additive": false,
+      "estimatedLockRisk": "medium",
+      "backwardCompatible": true,
+      "notes": "Migrates the unused legacy export_jobs queue into the shared jobs table, then drops export_jobs. The migration aborts on UUID collision instead of losing history.",
+      "rollback": "Restore from a verified pre-upgrade backup if the legacy queue must be recovered; do not recreate dual active queues."
+    },
+    "0037_final_release_hardening": {
+      "additive": true,
+      "estimatedLockRisk": "low",
+      "backwardCompatible": true,
+      "notes": "Adds the exact seven @better-auth/scim 1.7.2 plugin models used by the configured static/application-owned SCIM mode plus a sanitized read-only platform operational-health projection. No existing application data is rewritten.",
+      "rollback": "Disable SCIM ingress and stop Better Auth provisioning first. Drop only empty/unreferenced SCIM plugin tables after confirming no directory has provisioned resources. Drop platform_operational_health independently; it contains diagnostic metadata only."
+    },
+    "0038_administrator_capability_backfill": {
+      "additive": true,
+      "estimatedLockRisk": "low",
+      "backwardCompatible": true,
+      "notes": "Idempotently grants existing administrator roles the complete capability vocabulary so tenants created before the latest release receive new features without duplicate role rows.",
+      "rollback": "Delete only capability rows added by this migration after confirming the corresponding features are disabled; do not remove administrator roles or pre-existing grants."
+    },
+    "0040_platform_backup_operations": {
+      "additive": true,
+      "estimatedLockRisk": "low",
+      "backwardCompatible": true,
+      "notes": "Extends the existing platform operation allow-list for encrypted backup creation and verification; backup bytes and credentials remain outside the Web process.",
+      "rollback": "Drain backup operations and restore the previous allow-list only after verifying no backup request is queued or running."
+    },
+    "0041_platform_operation_controls": {
+      "additive": true,
+      "estimatedLockRisk": "low",
+      "backwardCompatible": true,
+      "notes": "Adds worker-mediated retry and cancellation states to the platform operation queue. Web retains INSERT/SELECT only; the privileged worker remains the sole mutator.",
+      "rollback": "Drain and disable retry/cancel controls, then restore the prior queue status constraint only after no cancelled rows or control requests remain."
+    },
+    "0042_platform_audit_explorer": {
+      "additive": true,
+      "estimatedLockRisk": "low",
+      "backwardCompatible": true,
+      "notes": "Adds a security-barrier, read-only projection for the platform audit explorer. The Web role receives no direct platform_audit_log privileges and audit writes remain privileged.",
+      "rollback": "Remove the audit explorer route and revoke the view grant before dropping app.platform_audit_explorer; keep the append-only platform_audit_log table intact."
+    },
+    "0043_sanitize_platform_audit_changes": {
+      "additive": true,
+      "estimatedLockRisk": "low",
+      "backwardCompatible": true,
+      "notes": "Tightens the existing audit explorer projection by redacting credential-shaped values and infrastructure targets from legacy changes text before it reaches the Web role.",
+      "rollback": "Reapply the 0042 projection only after confirming the platform audit route is removed or has an equivalent application-layer redaction."
+    },
+    "0044_fix_platform_audit_redaction": {
+      "additive": true,
+      "estimatedLockRisk": "low",
+      "backwardCompatible": true,
+      "notes": "Corrects the PostgreSQL replacement backreference in the existing audit projection so sensitive-key values are actually replaced rather than rendering a literal backreference.",
+      "rollback": "Keep the 0043 projection if the route is removed; do not restore direct Web access to platform_audit_log."
+    },
+    "0045_data_contract_cleanup": {
+      "additive": false,
+      "estimatedLockRisk": "medium",
+      "backwardCompatible": false,
+      "notes": "Converts legacy text booleans to native PostgreSQL boolean and adds database-level JSON integrity constraints. Deploy only with the matching application release after validating existing values.",
+      "rollback": "Convert boolean columns back to text using CASE expressions, restore legacy boolean checks/defaults, and drop the *_json_check constraints. Take a verified backup before deployment."
+    },
+    "0046_retire_tenant_mfa": {
+      "additive": false,
+      "estimatedLockRisk": "low",
+      "backwardCompatible": true,
+      "notes": "Retires MFA enrollment and trusted MFA session state for tenant users, clears legacy tenant secrets, and disables the obsolete institution policy while preserving tenantless platform-operator MFA.",
+      "rollback": "Restore only from a verified pre-migration backup if tenant MFA is intentionally reintroduced; do not restore secrets from application logs or reconstruct encrypted enrollment state."
+    },
+    "0047_better_auth_issuer_compatibility": {
+      "additive": false,
+      "estimatedLockRisk": "low",
+      "backwardCompatible": true,
+      "notes": "Completes the Better Auth 1.7.3 upgrade by relaxing the historical 1.7.0-1.7.2 account.issuer column and removing its obsolete compound unique index. Existing issuer values remain intact for audit/provenance; new Better Auth rows omit the legacy column.",
+      "rollback": "Restore only from a verified pre-migration backup if the legacy issuer constraint is intentionally reintroduced; do not recreate the compound unique index while current Better Auth 1.7.3 is active."
+    }
+  }
+}

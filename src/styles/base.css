@@ -1,0 +1,375 @@
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * The registry's surface, in one place.
+ *
+ * Tailwind v4 takes its design tokens from CSS rather than a JS config, so this
+ * file *is* the theme. Every colour below is an OKLCH triple because the shell
+ * has to hold up in both light and dark without a designer re-picking every
+ * value: OKLCH lightness is perceptual, so flipping the palette keeps contrast
+ * ratios roughly where they were instead of drifting into unreadable greys.
+ */
+
+@theme {
+  --font-sans:
+    "Vazirmatn Variable", "Vazirmatn", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+  /* Latin digits, code and identifiers only — never body text in Persian. */
+  --font-mono: "Cascadia Mono", "Consolas", ui-monospace, monospace;
+
+  --radius: 0.625rem;
+}
+
+:root {
+  --background: oklch(0.975 0.012 84);
+  --foreground: oklch(0.22 0.018 60);
+  --card: oklch(0.995 0.006 84);
+  --card-foreground: oklch(0.22 0.018 60);
+  --popover: oklch(0.995 0.006 84);
+  --popover-foreground: oklch(0.22 0.018 60);
+  --primary: oklch(0.53 0.13 45);
+  --primary-foreground: oklch(0.985 0.018 84);
+  --secondary: oklch(0.945 0.018 84);
+  --secondary-foreground: oklch(0.25 0.018 60);
+  --muted: oklch(0.95 0.015 84);
+  --muted-foreground: oklch(0.49 0.024 65);
+  --accent: oklch(0.94 0.025 72);
+  --accent-foreground: oklch(0.25 0.018 60);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.87 0.02 80);
+  --input: oklch(0.87 0.02 80);
+  --ring: oklch(0.53 0.13 45);
+  --chart-1: oklch(0.58 0.12 45);
+  --chart-2: oklch(0.62 0.09 75);
+  --chart-3: oklch(0.55 0.08 150);
+  --chart-4: oklch(0.54 0.08 220);
+  --chart-5: oklch(0.52 0.1 300);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.18 0.015 60);
+  --sidebar-foreground: oklch(0.93 0.025 84);
+  --sidebar-primary: oklch(0.66 0.14 50);
+  --sidebar-primary-foreground: oklch(0.18 0.015 60);
+  --sidebar-accent: oklch(0.245 0.018 60);
+  --sidebar-accent-foreground: oklch(0.965 0.02 84);
+  --sidebar-border: oklch(0.36 0.018 60);
+  --sidebar-ring: oklch(0.66 0.14 50);
+
+  --success: oklch(0.58 0.16 150);
+  --success-foreground: oklch(1 0 0);
+  --success-subtle: oklch(0.965 0.035 150);
+  --success-subtle-foreground: oklch(0.38 0.13 150);
+  --success-subtle-border: oklch(0.85 0.08 150);
+
+  --warning: oklch(0.74 0.16 65);
+  --warning-foreground: oklch(0.2 0.03 65);
+  --warning-subtle: oklch(0.975 0.035 75);
+  --warning-subtle-foreground: oklch(0.48 0.14 65);
+  --warning-subtle-border: oklch(0.86 0.09 75);
+
+  --danger: oklch(0.58 0.22 25);
+  --danger-foreground: oklch(1 0 0);
+  --danger-subtle: oklch(0.965 0.03 20);
+  --danger-subtle-foreground: oklch(0.46 0.2 25);
+  --danger-subtle-border: oklch(0.85 0.09 20);
+
+  --info: oklch(0.56 0.18 250);
+  --info-foreground: oklch(1 0 0);
+  --info-subtle: oklch(0.965 0.025 250);
+  --info-subtle-foreground: oklch(0.42 0.15 250);
+  --info-subtle-border: oklch(0.84 0.08 250);
+
+  --category-1: oklch(0.89 0.07 190);
+  --category-1-foreground: oklch(0.35 0.08 190);
+  --category-2: oklch(0.89 0.07 260);
+  --category-2-foreground: oklch(0.35 0.1 260);
+  --category-3: oklch(0.89 0.08 330);
+  --category-3-foreground: oklch(0.35 0.11 330);
+  --category-4: oklch(0.89 0.06 210);
+  --category-4-foreground: oklch(0.35 0.08 210);
+  --category-5: oklch(0.89 0.08 310);
+  --category-5-foreground: oklch(0.35 0.11 310);
+  --category-6: oklch(0.89 0.07 240);
+  --category-6-foreground: oklch(0.35 0.1 240);
+  --category-7: oklch(0.89 0.09 150);
+  --category-7-foreground: oklch(0.35 0.09 150);
+  --category-8: oklch(0.89 0.07 285);
+  --category-8-foreground: oklch(0.35 0.1 285);
+
+  --measure-page: 100rem;
+  --measure-form: 68rem;
+  --measure-column: 45rem;
+}
+
+.dark {
+  --background: oklch(0.16 0.014 60);
+  --foreground: oklch(0.94 0.025 84);
+  --card: oklch(0.205 0.016 60);
+  --card-foreground: oklch(0.94 0.025 84);
+  --popover: oklch(0.205 0.016 60);
+  --popover-foreground: oklch(0.94 0.025 84);
+  --primary: oklch(0.67 0.14 52);
+  --primary-foreground: oklch(0.18 0.015 60);
+  --secondary: oklch(0.26 0.016 60);
+  --secondary-foreground: oklch(0.94 0.025 84);
+  --muted: oklch(0.245 0.016 60);
+  --muted-foreground: oklch(0.72 0.025 78);
+  --accent: oklch(0.27 0.022 65);
+  --accent-foreground: oklch(0.95 0.025 84);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.809 0.105 251.813);
+  --chart-2: oklch(0.623 0.214 259.815);
+  --chart-3: oklch(0.546 0.245 262.881);
+  --chart-4: oklch(0.488 0.243 264.376);
+  --chart-5: oklch(0.424 0.199 265.638);
+  --sidebar: oklch(0.115 0.012 60);
+  --sidebar-foreground: oklch(0.94 0.025 84);
+  --sidebar-primary: oklch(0.72 0.14 55);
+  --sidebar-primary-foreground: oklch(0.18 0.015 60);
+  --sidebar-accent: oklch(0.22 0.016 60);
+  --sidebar-accent-foreground: oklch(0.96 0.025 84);
+  --sidebar-border: oklch(0.3 0.018 60);
+  --sidebar-ring: oklch(0.72 0.14 55);
+
+  --success: oklch(0.65 0.15 150);
+  --success-subtle: oklch(0.22 0.05 150);
+  --success-subtle-foreground: oklch(0.82 0.12 150);
+  --success-subtle-border: oklch(0.38 0.09 150);
+
+  --warning: oklch(0.78 0.15 65);
+  --warning-subtle: oklch(0.24 0.05 70);
+  --warning-subtle-foreground: oklch(0.85 0.12 70);
+  --warning-subtle-border: oklch(0.42 0.1 70);
+
+  --danger: oklch(0.65 0.2 25);
+  --danger-subtle: oklch(0.22 0.06 20);
+  --danger-subtle-foreground: oklch(0.85 0.14 20);
+  --danger-subtle-border: oklch(0.4 0.11 20);
+
+  --info: oklch(0.66 0.17 250);
+  --info-subtle: oklch(0.22 0.05 250);
+  --info-subtle-foreground: oklch(0.84 0.12 250);
+  --info-subtle-border: oklch(0.38 0.09 250);
+
+  --category-1: oklch(0.32 0.06 190);
+  --category-1-foreground: oklch(0.88 0.07 190);
+  --category-2: oklch(0.32 0.07 260);
+  --category-2-foreground: oklch(0.88 0.06 260);
+  --category-3: oklch(0.32 0.08 330);
+  --category-3-foreground: oklch(0.88 0.07 330);
+  --category-4: oklch(0.32 0.05 210);
+  --category-4-foreground: oklch(0.88 0.05 210);
+  --category-5: oklch(0.32 0.08 310);
+  --category-5-foreground: oklch(0.88 0.07 310);
+  --category-6: oklch(0.32 0.07 240);
+  --category-6-foreground: oklch(0.88 0.06 240);
+  --category-7: oklch(0.32 0.06 150);
+  --category-7-foreground: oklch(0.88 0.08 150);
+  --category-8: oklch(0.32 0.07 285);
+  --category-8-foreground: oklch(0.88 0.06 285);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-subtle: var(--success-subtle);
+  --color-success-subtle-foreground: var(--success-subtle-foreground);
+  --color-success-subtle-border: var(--success-subtle-border);
+
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-warning-subtle-foreground: var(--warning-subtle-foreground);
+  --color-warning-subtle-border: var(--warning-subtle-border);
+
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-danger-subtle: var(--danger-subtle);
+  --color-danger-subtle-foreground: var(--danger-subtle-foreground);
+  --color-danger-subtle-border: var(--danger-subtle-border);
+
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-subtle: var(--info-subtle);
+  --color-info-subtle-foreground: var(--info-subtle-foreground);
+  --color-info-subtle-border: var(--info-subtle-border);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  /*
+   * `--font-sans` is NOT redeclared here, and that removal is deliberate.
+   *
+   * shadcn's init writes `--font-sans: var(--font-sans)` into this block,
+   * because its template expects a Next font loader to define the value on
+   * `:root` from outside. This project installs the font instead, so the
+   * variable is already defined in the `@theme` block above — and re-declaring
+   * it as a reference to itself inside `@theme inline` makes it circular, which
+   * CSS resolves to nothing and the browser answers with its default serif.
+   *
+   * One heading token, pointing at the same family: a registry is read, not
+   * branded, and a second typeface is a second thing to license, ship and
+   * fall back from.
+   */
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+    @apply border-border outline-ring/50;
+  }
+
+  html,
+  body,
+  input,
+  button,
+  select,
+  textarea,
+  optgroup,
+  table,
+  th,
+  td {
+    font-family: var(--font-sans);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    /* Persian text sits low in its line box; the default leading crowds
+       descenders against the next line, which is worse in dense tables. */
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    @apply bg-background text-foreground;
+  }
+
+  /*
+   * Numbers, in a document that is read right to left.
+   *
+   * A student number, a sitting number and a national ID are all runs of digits
+   * inside Persian sentences, and the bidirectional algorithm will reorder them
+   * against neighbouring punctuation if left alone. `dir="ltr"` on the span that
+   * holds them is the fix; `tabular-nums` is what keeps a column of them from
+   * shifting horizontally as the values change.
+   */
+  .numeric {
+    direction: ltr;
+    unicode-bidi: isolate;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+   * Focus has to be visible on every interactive thing, always.
+   *
+   * This registry is operated by people who type all day and use the keyboard
+   * far more than the mouse. A focus ring that only appears "sometimes" is the
+   * difference between a form that can be filled without looking down and one
+   * that cannot.
+   */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+#main-content {
+  background-color: var(--background);
+  background-image: radial-gradient(
+    ellipse 90% 42% at 50% 0%,
+    color-mix(in oklab, var(--primary) 4%, transparent),
+    transparent
+  );
+  background-size: 100% 100%;
+  background-attachment: local;
+}
+
+.dark #main-content {
+  background-color: var(--background);
+  background-image: radial-gradient(
+    ellipse 90% 42% at 50% 0%,
+    color-mix(in oklab, var(--primary) 8%, transparent),
+    transparent
+  );
+  background-size: 100% 100%;
+  background-attachment: local;
+}
+
+.glass-card {
+  background: color-mix(in oklab, var(--card) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in oklab, var(--border) 75%, transparent);
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.04),
+    0 1px 2px -1px rgba(0, 0, 0, 0.03);
+}
+
+.dark .glass-card {
+  background: color-mix(in oklab, var(--card) 82%, transparent);
+  backdrop-filter: blur(16px);
+  border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.35);
+}
+
+.glass-panel {
+  background: color-mix(in oklab, var(--background) 88%, transparent);
+  backdrop-filter: blur(16px);
+  border: 1px solid color-mix(in oklab, var(--border) 75%, transparent);
+}
+
+.glow-primary {
+  box-shadow: 0 8px 24px -12px color-mix(in oklab, var(--primary) 30%, transparent);
+}
+
+.glow-card {
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.glow-card:hover {
+  box-shadow:
+    0 8px 22px -10px rgba(71, 53, 36, 0.2),
+    0 2px 6px -2px rgba(71, 53, 36, 0.08);
+}
+
+.dark .glow-card:hover {
+  box-shadow:
+    0 10px 24px -10px rgba(0, 0, 0, 0.55),
+    0 0 16px -8px color-mix(in oklab, var(--primary) 16%, transparent);
+}
