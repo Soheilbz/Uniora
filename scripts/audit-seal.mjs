@@ -19,11 +19,14 @@ import { basename, join, resolve } from "node:path";
 import pg from "pg";
 
 const { Client } = pg;
-const url = process.env.DATABASE_ADMIN_URL?.trim();
+const databaseEnvironmentKey = process.env.DATABASE_PLATFORM_URL?.trim()
+  ? "DATABASE_PLATFORM_URL"
+  : "DATABASE_ADMIN_URL";
+const url = process.env[databaseEnvironmentKey]?.trim();
 const operator = process.env.PLATFORM_OPERATOR?.trim();
 const key = process.env.AUDIT_SEAL_KEY?.trim();
 const root = resolve(process.env.AUDIT_SEAL_DIR?.trim() || "./audit-seals");
-if (!url) fail("DATABASE_ADMIN_URL is required");
+if (!url) fail(`${databaseEnvironmentKey} is required`);
 if (!operator) fail("PLATFORM_OPERATOR is required");
 if (!key || key.length < 32) fail("AUDIT_SEAL_KEY must contain at least 32 characters");
 mkdirSync(root, { recursive: true, mode: 0o700 });
