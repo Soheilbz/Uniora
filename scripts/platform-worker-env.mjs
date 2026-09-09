@@ -15,7 +15,8 @@ if (args.length === 0) {
 const envFile = [".env.platform-worker.local", ".env.platform-worker"]
   .map((name) => resolve(root, name))
   .find((candidate) => existsSync(candidate));
-const childArgs = envFile ? [`--env-file=${envFile}`, ...args] : args;
+const e2eLane = process.env.UNIV_E2E === "1" && process.env.E2E_EXTERNAL_SERVER === "1";
+const childArgs = envFile && !e2eLane ? [`--env-file=${envFile}`, ...args] : args;
 const childEnv = { ...process.env };
 /* Keep Web/tenant/one-shot credentials out of the long-running Platform
  * worker even when its supervisor inherited .env.local. When no dedicated
@@ -40,7 +41,7 @@ for (const key of [
   "SEED_ADMIN_PASSWORD",
 ])
   delete childEnv[key];
-if (envFile) {
+if (envFile && !e2eLane) {
   delete childEnv.DATABASE_PLATFORM_URL;
   delete childEnv.DATABASE_URL;
 }

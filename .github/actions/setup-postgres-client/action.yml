@@ -1,0 +1,26 @@
+name: Univ Web PostgreSQL client
+description: Use the pinned PostgreSQL client image for logical backup and restore tools.
+
+inputs:
+  image:
+    description: Fully pinned PostgreSQL image used only as the client runtime.
+    required: false
+    default: postgres:18.6@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280
+
+runs:
+  using: composite
+  steps:
+    - name: Expose pinned PostgreSQL client tools
+      shell: bash
+      env:
+        PG_DOCKER_IMAGE: ${{ inputs.image }}
+      run: |
+        set -euo pipefail
+        client_dir="$RUNNER_TEMP/univ-postgres-client"
+        mkdir -p "$client_dir"
+        ln -sfn "$GITHUB_WORKSPACE/scripts/ci/postgres-container-client.mjs" "$client_dir/pg_dump"
+        ln -sfn "$GITHUB_WORKSPACE/scripts/ci/postgres-container-client.mjs" "$client_dir/pg_restore"
+        docker image inspect "$PG_DOCKER_IMAGE" >/dev/null
+        PG_BIN_DIR="$client_dir" PG_DOCKER_IMAGE="$PG_DOCKER_IMAGE" "$client_dir/pg_dump" --version
+        echo "PG_BIN_DIR=$client_dir" >> "$GITHUB_ENV"
+        echo "PG_DOCKER_IMAGE=$PG_DOCKER_IMAGE" >> "$GITHUB_ENV"

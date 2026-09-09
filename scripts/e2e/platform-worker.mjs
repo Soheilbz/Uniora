@@ -29,6 +29,11 @@ export async function startPlatformWorker({
         ...process.env,
         ...platformWorkerFile,
         ...laneEnv,
+        /* This child has already received the lane-specific values above.
+           The launcher must not reload the shared developer worker file and
+           silently point all lanes back at the local database. */
+        UNIV_E2E: "1",
+        E2E_EXTERNAL_SERVER: "1",
         NODE_ENV: "development",
         DATABASE_PLATFORM_URL: laneDatabaseUrl(
           platformWorkerFile.DATABASE_PLATFORM_URL ?? process.env.DATABASE_PLATFORM_URL,
