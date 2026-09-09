@@ -226,9 +226,15 @@ const laneConcurrency = Math.max(
  * PostgreSQL cluster. Keep its default bounded by the same safe concurrency
  * budget as the browser phase; an explicit lower value is useful on smaller
  * developer machines without changing the qualification default. */
+const requestedProvisionConcurrency = Number(process.env.E2E_PROVISION_CONCURRENCY);
 const provisionConcurrency = Math.max(
   1,
-  Math.min(lanes.length, Number(process.env.E2E_PROVISION_CONCURRENCY) || laneConcurrency),
+  Math.min(
+    laneConcurrency,
+    Number.isFinite(requestedProvisionConcurrency) && requestedProvisionConcurrency > 0
+      ? Math.floor(requestedProvisionConcurrency)
+      : laneConcurrency,
+  ),
 );
 
 /* A lane owns one Web pool, while all lanes share the same disposable
