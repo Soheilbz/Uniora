@@ -279,11 +279,16 @@ jobs:
           --health-retries 10
     env:
       DATABASE_ADMIN_URL: postgresql://univ_owner:ci-e2e-owner@localhost:5432/univ
+      DATABASE_URL: postgresql://univ_app_web:ci-e2e-web-password@localhost:5432/univ
+      DATABASE_PLATFORM_URL: postgresql://univ_platform_worker:ci-e2e-platform-password@localhost:5432/univ
       APP_DB_PASSWORD: ci-e2e-web-password
       WORKER_DB_PASSWORD: ci-e2e-worker-password
       PLATFORM_DB_PASSWORD: ci-e2e-platform-password
       BETTER_AUTH_SECRET: ci-e2e-build-auth-key-0123456789abcdef0123456789abcdef
       BETTER_AUTH_URL: http://127.0.0.1:3020
+      PLATFORM_OPERATION_ENCRYPTION_KEY: ci-e2e-platform-operation-key-0123456789abcdef0123456789abcdef
+      BACKUP_ACTIVE_KEY_ID: ci-e2e-backup
+      BACKUP_ENCRYPTION_KEYS: '{"ci-e2e-backup":"ci-e2e-backup-key-0123456789abcdef0123456789abcdef"}'
       PUBLIC_FORM_RATE_SALT: ci-e2e-public-form-rate-salt-0123456789abcdef0123456789abcdef
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

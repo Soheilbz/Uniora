@@ -18,7 +18,9 @@ const envFile = [".env.platform-worker.local", ".env.platform-worker"]
 const childArgs = envFile ? [`--env-file=${envFile}`, ...args] : args;
 const childEnv = { ...process.env };
 /* Keep Web/tenant/one-shot credentials out of the long-running Platform
- * worker even when its supervisor inherited .env.local. */
+ * worker even when its supervisor inherited .env.local. When no dedicated
+ * env file exists (for example, the disposable CI worker), the two database
+ * URLs are the explicit platform-worker contract and must remain available. */
 for (const key of [
   "DATABASE_ADMIN_URL",
   "DATABASE_WORKER_URL",
@@ -38,6 +40,10 @@ for (const key of [
   "SEED_ADMIN_PASSWORD",
 ])
   delete childEnv[key];
+if (envFile) {
+  delete childEnv.DATABASE_PLATFORM_URL;
+  delete childEnv.DATABASE_URL;
+}
 const child = spawn(process.execPath, childArgs, {
   cwd: root,
   env: childEnv,
