@@ -70,8 +70,8 @@ case "$ACTION" in
     echo "compose/env/host preflight passed"
     ;;
   build)
-    "$0" check
-    compose build --pull
+    echo "refusing to build on a deployment host; load or pull pre-qualified immutable images, then run '$0 check'" >&2
+    exit 2
     ;;
   certify)
     "$0" check
@@ -83,7 +83,7 @@ case "$ACTION" in
     ;;
   up)
     "$0" check
-    compose up -d --remove-orphans --wait --wait-timeout 120
+    compose up -d --no-build --remove-orphans --wait --wait-timeout 120
     compose ps
     ;;
   down)
@@ -91,7 +91,7 @@ case "$ACTION" in
     ;;
   restart)
     "$0" check
-    compose up -d --remove-orphans --force-recreate --wait --wait-timeout 120
+    compose up -d --no-build --remove-orphans --force-recreate --wait --wait-timeout 120
     compose ps
     ;;
   status)
@@ -102,7 +102,7 @@ case "$ACTION" in
     compose logs --tail=200 -f "$@"
     ;;
   *)
-    echo "usage: $0 {prepare|check|build|certify|up|down|restart|status|logs [service]}" >&2
+    echo "usage: $0 {prepare|check|certify|up|down|restart|status|logs [service]}" >&2
     exit 2
     ;;
 esac

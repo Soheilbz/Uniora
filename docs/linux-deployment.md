@@ -39,9 +39,17 @@ sudoedit /etc/univ-web/web.env
 sudoedit /etc/univ-web/worker.env
 sudoedit /etc/univ-web/platform-worker.env
 sudoedit /etc/univ-web/operations.env
-sudo ./deploy/linux-stack.sh check
-sudo ./deploy/linux-stack.sh build
 ```
+
+Load or pull the four pre-qualified production images for this release, then run:
+
+```bash
+sudo ./deploy/linux-stack.sh check
+```
+
+The deployment host deliberately does not
+build images; image construction belongs to the verified release pipeline and
+must use `pnpm docker:build` with its offline dependency contexts.
 
 Before running `prepare-host.sh`, the host must have Docker Engine, the Compose
 plugin and Buildx installed, and the Docker daemon must be running. Verify the
@@ -95,7 +103,12 @@ curl --fail http://127.0.0.1:3000/api/healthz
 curl --fail http://127.0.0.1:3000/api/readyz
 ```
 
-`linux-stack.sh up` uses Compose `--wait`; the Web image has a healthcheck and startup fails if the stack does not become ready/running within the configured timeout. Expose only the reverse proxy, normally ports 80/443. Compose binds the application itself to loopback by default. Configure TLS from `deploy/nginx/univ-web.conf.example` or an equivalent reviewed reverse proxy.
+`linux-stack.sh up` uses Compose `--no-build --wait`; the deployment host never
+creates a new image or build cache during startup. The Web image has a healthcheck
+and startup fails if the stack does not become ready/running within the configured
+timeout. Expose only the reverse proxy, normally ports 80/443. Compose binds the
+application itself to loopback by default. Configure TLS from
+`deploy/nginx/univ-web.conf.example` or an equivalent reviewed reverse proxy.
 
 ## Boot integration
 
@@ -113,7 +126,7 @@ The unit reads `/etc/univ-web/stack.env`, runs the dependency-free Bash host pre
 1. Create and verify a fresh encrypted backup and its off-host copy.
 2. Copy the reviewed source into a new `/opt/univ-web/releases/<release-id>` directory.
 3. Run the release certification pipeline on that exact source revision.
-4. Build the four isolated production images (Web, tenant worker, Platform worker and operations) and validate Compose.
+4. Build and qualify the four isolated production images in the release pipeline; load or pull those exact images on the deployment host and validate Compose.
 5. Run migration and `db:setup` explicitly through the profile-gated operations service.
 6. Run `linux-stack.sh certify` against the production environment.
 7. Atomically point `/opt/univ-web/current` to the new release and start/recreate the stack.

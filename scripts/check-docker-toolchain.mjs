@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
@@ -21,6 +21,9 @@ if (projectPackage.packageManager !== `pnpm@${manifest.version}`) {
 }
 if (projectPackage.scripts?.["docker:preflight"] !== "node scripts/docker-preflight.mjs") {
   failures.push("package.json must expose the Docker registry preflight diagnostic");
+}
+if (projectPackage.scripts?.["docker:cleanup"] !== "node scripts/docker-cleanup.mjs") {
+  failures.push("package.json must expose the bounded Docker cleanup policy");
 }
 
 for (const [relative, expected] of Object.entries(manifest.runtimeFiles ?? {})) {
@@ -61,11 +64,26 @@ for (const token of [
   if (!dockerfile.includes(token))
     failures.push(`Dockerfile is missing the pinned toolchain contract: ${token}`);
 }
+const dockerBuildHelper = readFileSync(join(root, "scripts/docker-build.mjs"), "utf8");
+for (const token of [
+  'runCleanup(selectedImageRefs, "pre-build")',
+  "org.opencontainers.image.source=https://github.com/Soheilbz/Uniora",
+  "com.univ-web.managed=true",
+]) {
+  if (!dockerBuildHelper.includes(token))
+    failures.push(`Docker build helper is missing the bounded artifact contract: ${token}`);
+}
+if (!existsSync(join(root, "scripts/docker-cleanup.mjs")))
+  failures.push("Docker build helper cleanup script is missing");
 if (dockerfile.includes("corepack enable")) {
   failures.push("Dockerfile must not acquire pnpm through Corepack at build time");
 }
 if (dockerfile.includes("apk upgrade --no-cache")) {
   failures.push("Dockerfile must not resolve an unpinned Alpine upgrade during image builds");
+}
+const dockerCleanup = readFileSync(join(root, "scripts/docker-cleanup.mjs"), "utf8");
+if (dockerCleanup.includes('"--all"')) {
+  failures.push("Docker cleanup must not use buildx prune --all on a shared/default builder");
 }
 if (dockerfile.includes("apk add --no-cache ca-certificates")) {
   failures.push("Dockerfile must not reacquire the CA bundle already present in the pinned base");
@@ -77,10 +95,10 @@ if (/^# syntax=docker\/dockerfile:/m.test(dockerfile)) {
 }
 for (const workflow of [".github/workflows/ci.yml", ".github/workflows/supply-chain.yml"]) {
   const source = readFileSync(join(root, workflow), "utf8");
-  for (const token of ["--build-context pnpm-store=", "--build-context pnpm-metadata="]) {
-    if (!source.includes(token))
-      failures.push(`${workflow} is missing the verified Docker context ${token}`);
-  }
+  if (!source.includes("pnpm docker:build"))
+    failures.push(`${workflow} must use the repository Docker build helper`);
+  if (!source.includes("pnpm docker:cleanup --apply"))
+    failures.push(`${workflow} must run bounded Docker cleanup after image qualification`);
   if (source.includes("corepack prepare pnpm@"))
     failures.push(`${workflow} must use the vendored pnpm runtime`);
 }

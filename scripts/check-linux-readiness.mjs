@@ -75,6 +75,7 @@ const compose = read("deploy/compose.production.yml");
 for (const token of [
   "127.0.0.1:" + "$" + "{UNIV_WEB_PORT:-3000}:3000",
   "read_only: true",
+  "pull_policy: never",
   "cap_drop:",
   "no-new-privileges:true",
   "job-worker:",

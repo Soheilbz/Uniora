@@ -304,16 +304,12 @@ jobs:
           PLATFORM_RESTORE_ALLOWED=YES node scripts/platform-backup.mjs restore
           --file "$BACKUP_MANIFEST" --confirm RESTORE:univ
       - name: Build isolated production runtime images
-        run: |
-          pnpm_store="$(pnpm store path)"
-          pnpm_store="${pnpm_store%/v11}"
-          pnpm_metadata="$HOME/.cache/pnpm"
-          test -f "$pnpm_store/v11/index.db"
-          test -d "$pnpm_metadata"
-          docker buildx build --load --progress=plain \
-            --build-context pnpm-store="$pnpm_store" \
-            --build-context pnpm-metadata="$pnpm_metadata" \
-            --target runner --tag univ-web:ci .
+        env:
+          UNIV_RUNNER_IMAGE: univ-web:ci
+        run: pnpm docker:build --target=runner
+      - name: Bound Docker cleanup
+        if: always()
+        run: pnpm docker:cleanup --apply --keep=univ-web:ci
 
   e2e:
     name: Browser end-to-end suite
@@ -373,6 +369,8 @@ jobs:
           else
             echo "all pinned Playwright browser binaries restored from cache"
           fi
+      - name: Install pinned Playwright host dependencies
+        run: pnpm exec playwright install-deps chromium firefox webkit
       - name: Apply migrations
         run: pnpm db:migrate
       - name: Provision runtime roles

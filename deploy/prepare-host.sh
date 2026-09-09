@@ -79,7 +79,7 @@ Next:
   1. edit $CONFIG_ROOT/web.env, worker.env, platform-worker.env and operations.env
   2. point /opt/univ-web/current at this reviewed release
   3. run: cd /opt/univ-web/current && sudo ./deploy/linux-stack.sh check
-  4. build/pull release images, run db:migrate + db:setup, then ./deploy/linux-stack.sh certify
+  4. load/pull pre-qualified release images, run db:migrate + db:setup, then ./deploy/linux-stack.sh certify
   5. enable: systemctl enable --now univ-web-compose.service
   6. configure TLS reverse proxy from deploy/nginx/univ-web.conf.example
 MSG

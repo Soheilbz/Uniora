@@ -87,6 +87,7 @@
     "e2e": "pnpm build && node scripts/e2e/run.mjs",
     "e2e:fast": "node scripts/e2e/run.mjs --no-build",
     "docker:build": "node scripts/docker-build.mjs",
+    "docker:cleanup": "node scripts/docker-cleanup.mjs",
     "docker:preflight": "node scripts/docker-preflight.mjs",
     "auth:schema:reconcile": "node scripts/reconcile-auth-schema.mjs",
     "release:prepare": "node scripts/release-prepare.mjs",

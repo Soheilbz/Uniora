@@ -11,7 +11,14 @@ const requestedTargets = process.argv
 const selectedTargets = requestedTargets.length ? requestedTargets : targets;
 const offline = !process.argv.includes("--online");
 const noCache = process.argv.includes("--no-cache");
+const cleanup = !process.argv.includes("--no-cleanup");
 const version = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).version;
+const defaultTags = {
+  runner: `univ-web:${version}`,
+  "tenant-worker": `univ-web-tenant-worker:${version}`,
+  "platform-worker": `univ-web-platform-worker:${version}`,
+  operations: `univ-web-operations:${version}`,
+};
 const store = resolve(process.env.UNIV_PNPM_STORE ?? join(root, ".univ", "cache", "pnpm-store"));
 const metadata = resolve(
   process.env.UNIV_PNPM_METADATA ??
@@ -49,13 +56,21 @@ for (const packageKey of [
   }
 }
 
+const selectedImageRefs = selectedTargets.map(
+  (target) =>
+    process.env[`UNIV_${target.replaceAll("-", "_").toUpperCase()}_IMAGE`] ?? defaultTags[target],
+);
+
+if (cleanup) {
+  runCleanup(selectedImageRefs, "pre-build");
+}
+
 run("docker", ["info", "--format", "{{.ServerVersion}}"]);
 run("docker", ["buildx", "version"]);
 
 for (const target of selectedTargets) {
   const tag =
-    process.env[`UNIV_${target.replaceAll("-", "_").toUpperCase()}_IMAGE`] ??
-    `univ-web-${target}:${version}-stabilized`;
+    process.env[`UNIV_${target.replaceAll("-", "_").toUpperCase()}_IMAGE`] ?? defaultTags[target];
   const args = [
     "buildx",
     "build",
@@ -71,6 +86,12 @@ for (const target of selectedTargets) {
     target,
     "--tag",
     tag,
+    "--label",
+    "org.opencontainers.image.source=https://github.com/Soheilbz/Uniora",
+    "--label",
+    `org.opencontainers.image.version=${version}`,
+    "--label",
+    "com.univ-web.managed=true",
   ];
   if (noCache) args.push("--no-cache");
   args.push(".");
@@ -78,6 +99,19 @@ for (const target of selectedTargets) {
     `Building ${target} from pinned base/toolchain with ${offline ? "offline" : "bounded-online"} dependency acquisition: ${tag}`,
   );
   run("docker", args);
+}
+
+if (cleanup) {
+  runCleanup(selectedImageRefs, "post-build");
+}
+
+function runCleanup(imageRefs, phase) {
+  console.log(`Applying bounded Docker cleanup (${phase})`);
+  run(process.execPath, [
+    join(root, "scripts", "docker-cleanup.mjs"),
+    "--apply",
+    `--keep=${imageRefs.join(",")}`,
+  ]);
 }
 
 function run(command, args) {

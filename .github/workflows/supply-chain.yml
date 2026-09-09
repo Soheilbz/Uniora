@@ -35,28 +35,15 @@ jobs:
       - name: Materialize verified offline Docker dependency contexts
         run: pnpm install --frozen-lockfile
       - name: Build isolated runtime images
-        run: |
-          pnpm_store="$(pnpm store path)"
-          pnpm_store="${pnpm_store%/v11}"
-          pnpm_metadata="$HOME/.cache/pnpm"
-          test -f "$pnpm_store/v11/index.db"
-          test -d "$pnpm_metadata"
-          docker buildx build --load --progress=plain \
-            --build-context pnpm-store="$pnpm_store" \
-            --build-context pnpm-metadata="$pnpm_metadata" \
-            --target runner --tag univ-web:supply-chain .
-          docker buildx build --load --progress=plain \
-            --build-context pnpm-store="$pnpm_store" \
-            --build-context pnpm-metadata="$pnpm_metadata" \
-            --target tenant-worker --tag univ-web-tenant-worker:supply-chain .
-          docker buildx build --load --progress=plain \
-            --build-context pnpm-store="$pnpm_store" \
-            --build-context pnpm-metadata="$pnpm_metadata" \
-            --target platform-worker --tag univ-web-platform-worker:supply-chain .
-          docker buildx build --load --progress=plain \
-            --build-context pnpm-store="$pnpm_store" \
-            --build-context pnpm-metadata="$pnpm_metadata" \
-            --target operations --tag univ-web-operations:supply-chain .
+        env:
+          UNIV_RUNNER_IMAGE: univ-web:supply-chain
+          UNIV_TENANT_WORKER_IMAGE: univ-web-tenant-worker:supply-chain
+          UNIV_PLATFORM_WORKER_IMAGE: univ-web-platform-worker:supply-chain
+          UNIV_OPERATIONS_IMAGE: univ-web-operations:supply-chain
+        run: pnpm docker:build
+      - name: Bound Docker cleanup
+        if: always()
+        run: pnpm docker:cleanup --apply --keep=univ-web:supply-chain,univ-web-tenant-worker:supply-chain,univ-web-platform-worker:supply-chain,univ-web-operations:supply-chain
       - name: Generate runner image SBOM
         uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
         with:

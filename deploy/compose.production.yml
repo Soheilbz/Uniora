@@ -2,6 +2,9 @@ name: univ-web
 
 x-runtime-security: &runtime-security
   restart: unless-stopped
+  # Production consumes pre-qualified images only. A missing image must fail
+  # closed instead of causing an implicit registry pull or local build.
+  pull_policy: never
   init: true
   read_only: true
   cap_drop:
@@ -18,6 +21,7 @@ x-runtime-security: &runtime-security
       max-file: "5"
 
 x-tool-security: &tool-security
+  pull_policy: never
   read_only: true
   cap_drop:
     - ALL
@@ -35,10 +39,6 @@ services:
   web:
     <<: *runtime-security
     user: "${UNIV_RUNTIME_UID:-1000}:${UNIV_RUNTIME_GID:-1000}"
-    build:
-      context: ..
-      dockerfile: Dockerfile
-      target: runner
     image: ${UNIV_WEB_IMAGE:-univ-web:0.8.2}
     env_file:
       - ${UNIV_WEB_WEB_ENV_FILE:-/etc/univ-web/web.env}
@@ -57,10 +57,6 @@ services:
   job-worker:
     <<: *runtime-security
     user: "${UNIV_RUNTIME_UID:-1000}:${UNIV_RUNTIME_GID:-1000}"
-    build:
-      context: ..
-      dockerfile: Dockerfile
-      target: tenant-worker
     image: ${UNIV_TENANT_WORKER_IMAGE:-univ-web-tenant-worker:0.8.2}
     command: ["node", "scripts/job-worker.mjs"]
     env_file:
@@ -75,10 +71,6 @@ services:
   platform-worker:
     <<: *runtime-security
     user: "${UNIV_RUNTIME_UID:-1000}:${UNIV_RUNTIME_GID:-1000}"
-    build:
-      context: ..
-      dockerfile: Dockerfile
-      target: platform-worker
     image: ${UNIV_PLATFORM_WORKER_IMAGE:-univ-web-platform-worker:0.8.2}
     command: ["node", "scripts/platform-worker.js"]
     env_file:
@@ -97,10 +89,6 @@ services:
     <<: *tool-security
     user: "${UNIV_RUNTIME_UID:-1000}:${UNIV_RUNTIME_GID:-1000}"
     profiles: ["tools"]
-    build:
-      context: ..
-      dockerfile: Dockerfile
-      target: operations
     image: ${UNIV_OPERATIONS_IMAGE:-univ-web-operations:0.8.2}
     command: ["node", "scripts/production-db-check.mjs"]
     env_file:
