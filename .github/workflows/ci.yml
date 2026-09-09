@@ -265,15 +265,31 @@ jobs:
           OBJECT_STORAGE_SECRET_ACCESS_KEY: ci-worker-secret
           ANTIVIRUS_HTTP_ENDPOINT: http://127.0.0.1:9110/scan
         run: |
-          job_id="$(psql "$DATABASE_ADMIN_URL" -Atc "
+          psql -v ON_ERROR_STOP=1 "$DATABASE_ADMIN_URL" <<'SQL'
+          do $$
+          declare
+            seeded_tenant_id uuid;
+            seeded_requester_id uuid;
+          begin
+            select id into seeded_tenant_id from tenants where slug='univ';
+            if seeded_tenant_id is null then
+              raise exception 'seeded tenant univ is missing';
+            end if;
+            perform set_config('app.tenant_id', seeded_tenant_id::text, false);
+            select id into seeded_requester_id
+              from "user"
+             where tenant_id=seeded_tenant_id
+               and display_username='admin'
+               and must_change_password=false
+             limit 1;
+            if seeded_requester_id is null then
+              raise exception 'seeded administrator is missing';
+            end if;
             insert into jobs(tenant_id,requested_by,kind)
-            select t.id,u.id,'export.students'
-              from tenants t
-              join \"user\" u on u.tenant_id=t.id
-             where t.slug='univ' and u.display_username='admin'
-            returning id
-          ")"
-          [[ "$job_id" =~ ^[0-9a-f-]{36}$ ]]
+            values (seeded_tenant_id,seeded_requester_id,'export.students');
+          end
+          $$;
+          SQL
           env -u DATABASE_ADMIN_URL -u DATABASE_PLATFORM_URL -u APP_DB_PASSWORD \
             -u WORKER_DB_PASSWORD -u PLATFORM_DB_PASSWORD -u BETTER_AUTH_SECRET \
             -u MFA_ENCRYPTION_KEY -u MFA_ENCRYPTION_KEYS -u MFA_ACTIVE_KEY_ID \
