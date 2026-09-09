@@ -138,6 +138,9 @@ const child = spawn(process.execPath, [join(standalone, "server.js")], {
     PLATFORM_OPERATION_ENCRYPTION_KEY:
       "e2e-platform-operation-key-0123456789abcdef0123456789abcdef",
     INTEGRATION_ENCRYPTION_KEY: "e2e-integration-encryption-key-0123456789abcdef0123456789abcdef",
+    PUBLIC_FORM_RATE_SALT:
+      process.env.PUBLIC_FORM_RATE_SALT ??
+      "e2e-public-form-rate-salt-0123456789abcdef0123456789abcdef",
     PLATFORM_SESSION_HOURS: "4",
     BETTER_AUTH_URL: `http://127.0.0.1:${port}`,
     TRUSTED_ORIGINS: `http://127.0.0.1:${port}`,

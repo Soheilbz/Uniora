@@ -80,6 +80,7 @@ for (const token of [
   "contents: read",
   "performance:",
   "performance:regression",
+  "PostgreSQL 18.6 client from pinned service image",
   "MFA old-key rotation drill",
   "Backup old-key, rekey",
   "Background export worker drill",

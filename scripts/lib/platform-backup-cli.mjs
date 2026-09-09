@@ -63,7 +63,15 @@ export function postgresEnvironment(connectionString, environmentKey = "DATABASE
   if (!database) fail(`${environmentKey} must include a database name`);
 
   const env = {};
-  for (const name of ["PATH", "TEMP", "TMP", "TMPDIR", "HOME"]) {
+  for (const name of [
+    "PATH",
+    "TEMP",
+    "TMP",
+    "TMPDIR",
+    "HOME",
+    "GITHUB_WORKSPACE",
+    "PG_DOCKER_IMAGE",
+  ]) {
     if (process.env[name]) env[name] = process.env[name];
   }
   env.PGHOST = parsed.hostname.replace(/^\[|\]$/g, "");
