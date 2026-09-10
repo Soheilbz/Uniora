@@ -235,15 +235,28 @@ function printedLines(markup: string): string[] {
 
   return parts
     .join("")
-    .replace(/&#x27;/g, "'")
-    .replace(/&quot;/g, '"')
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
+    .replace(/&#x27;|&quot;|&amp;|&lt;|&gt;/g, decodePrintedEntity)
     .replace(/ /g, " ")
     .split("\n")
     .map((line) => line.replace(/\s+/g, " ").trim())
     .filter(Boolean);
+}
+
+function decodePrintedEntity(entity: string): string {
+  switch (entity) {
+    case "&#x27;":
+      return "'";
+    case "&quot;":
+      return '"';
+    case "&amp;":
+      return "&";
+    case "&lt;":
+      return "<";
+    case "&gt;":
+      return ">";
+    default:
+      return entity;
+  }
 }
 
 function golden(name: string): string[] {

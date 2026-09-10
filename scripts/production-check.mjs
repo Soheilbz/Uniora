@@ -187,13 +187,13 @@ for (const origin of origins) {
     parsed.username ||
     parsed.password
   ) {
-    failures.push(`TRUSTED_ORIGINS contains an invalid origin: ${origin}`);
+    failures.push("TRUSTED_ORIGINS contains an invalid origin");
   }
   if (strict && parsed && parsed.protocol !== "https:") {
-    failures.push(`TRUSTED_ORIGINS must use HTTPS in strict mode: ${origin}`);
+    failures.push("TRUSTED_ORIGINS must use HTTPS in strict mode");
   }
   if (strict && parsed && isLoopbackHostname(parsed.hostname)) {
-    failures.push(`TRUSTED_ORIGINS must not use a loopback hostname: ${origin}`);
+    failures.push("TRUSTED_ORIGINS must not use a loopback hostname");
   }
   if (origin === "*") failures.push("TRUSTED_ORIGINS must not use a wildcard");
 }
@@ -294,7 +294,7 @@ function configuredMfaSecrets() {
         failures.push("MFA_ENCRYPTION_KEYS contains an invalid key id or short secret");
       } else {
         if (looksPlaceholder(value))
-          failures.push(`MFA_ENCRYPTION_KEYS key ${id} must not use an example/placeholder value`);
+          failures.push("MFA_ENCRYPTION_KEYS must not contain an example/placeholder value");
         values.push(value);
       }
     }
