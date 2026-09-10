@@ -3,11 +3,12 @@ name: CI
 on:
   workflow_call:
   push:
-    branches: [main, 'codex/**']
+    branches: [main]
   pull_request:
+    branches: [main]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   # A newer commit supersedes an older candidate/main run; do not consume a
   # runner on an artifact that can no longer be the merge candidate.
   cancel-in-progress: true

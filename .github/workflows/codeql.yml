@@ -2,8 +2,9 @@ name: CodeQL
 
 on:
   push:
-    branches: [main, 'codex/**']
+    branches: [main]
   pull_request:
+    branches: [main]
   schedule:
     - cron: "41 3 * * 1"
 
@@ -11,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: codeql-${{ github.event.pull_request.number || github.ref }}
+  group: codeql-${{ github.head_ref || github.ref }}
   # A newer commit supersedes an older analysis for the same ref.
   cancel-in-progress: true
 

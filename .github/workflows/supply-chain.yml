@@ -2,8 +2,9 @@ name: Supply chain
 
 on:
   push:
-    branches: [main, 'codex/**']
+    branches: [main]
   pull_request:
+    branches: [main]
   schedule:
     - cron: "17 3 * * 1"
 
@@ -11,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: supply-chain-${{ github.event.pull_request.number || github.ref }}
+  group: supply-chain-${{ github.head_ref || github.ref }}
   # A newer commit supersedes an older supply-chain result for the same ref.
   cancel-in-progress: true
 
