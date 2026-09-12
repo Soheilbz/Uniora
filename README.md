@@ -40,7 +40,7 @@ Please do not put credentials, personal records or exploit details in a public i
 
 This repository is publicly visible for review, but it is **not an open-source project**. All rights are reserved by the project owner. No permission is granted to use, copy, modify, publish, distribute, sublicense or create derivative works from this code without prior written authorization. See [LICENSE](LICENSE).
 
-The public GitHub visibility and the ability to view or fork a repository do not grant a license to reuse or republish the source.
+Because this repository is public, GitHub users can view and fork it on GitHub under GitHub's Terms of Service. That platform feature does not grant broader permission to use, distribute or publish the software outside what those terms allow; all other rights remain reserved under the proprietary [license](LICENSE).
 
 ## Maintainers
 
