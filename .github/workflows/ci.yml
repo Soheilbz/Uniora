@@ -1,9 +1,10 @@
+# Full CI is required on pull requests; tagged releases call this workflow too.
+# main only accepts pull requests that pass the required gates, so running the
+# same expensive matrix again on the merge commit would repeat verification.
 name: CI
 
 on:
   workflow_call:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
 

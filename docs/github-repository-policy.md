@@ -10,10 +10,13 @@ or production-credential decision.
 - Repository: [`Soheilbz/Uniora`](https://github.com/Soheilbz/Uniora), default
   branch `main`; public for now, with the proprietary [`LICENSE`](../LICENSE).
 - Under [GitHub's fork and licensing rules](https://docs.github.com/en/pull-requests/reference/forks),
-  users can view and fork a public repository. The project
-  license does not grant a general right to use or redistribute the software.
-  Making the repository private would prevent future public access, but cannot
-  remove copies already made. The owner has chosen to keep it public for now.
+  users can view and fork a public repository, and public forks remain public.
+  Under those Terms, the owner grants users a nonexclusive license to use,
+  display, perform, and reproduce the content by forking it through GitHub. The
+  proprietary project license does not grant an independent right to use or
+  redistribute the software outside GitHub. If new public forks must be
+  prevented, the repository must become private; existing copies remain.
+  The owner has chosen to keep it public for now.
 - `main` is protected for administrators too. Pull requests must be up to date,
   use linear history, resolve conversations, and pass all required checks.
   Force-push and branch deletion are disabled.
@@ -64,6 +67,11 @@ or production-credential decision.
   checks opt-in because they can contact a secret's issuing provider.
 - CodeQL runs through the pinned workflow in `.github/workflows/codeql.yml`;
   the default CodeQL setup is intentionally not configured in parallel.
+- Full CI and image/SBOM scanning run as required pull-request gates, not again
+  on the resulting `main` merge commit. This avoids re-running the same expensive
+  matrix against an unchanged tree. CodeQL still runs on `main` pushes and the
+  image supply-chain workflow runs on its weekly schedule; tagged releases reuse
+  the full CI workflow before producing release evidence.
 - Tagged release creation is separate from PR qualification. No production
   environment, production secret, deployment, or release tag is configured as
   part of this candidate. Set up deployment environments and their protected

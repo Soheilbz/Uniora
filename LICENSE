@@ -2,11 +2,15 @@ Copyright (c) 2026 Soheilbz
 
 All rights reserved.
 
-This software and source code are proprietary. No permission is granted to use, copy,
-modify, publish, distribute, sublicense, sell, or create derivative works from this
-software or source code, in whole or in part, without prior written authorization from
-the copyright holder.
+This software and source code are proprietary. This repository is public on GitHub.
+Under [GitHub's Terms of Service](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service),
+users may view and fork this repository through GitHub. By making it public, the
+copyright holder grants other GitHub users a nonexclusive license to use, display,
+perform, and reproduce this content by forking it through the Service, as GitHub's
+functionality permits. Public forks remain public.
 
-The source may be viewed through the public repository solely for inspection. Public
-visibility, repository access, or the ability to fork does not grant any license or
-other right to reuse or republish the source.
+Those platform rights do not grant an independent license to use or redistribute the
+software outside GitHub. Except for rights granted by GitHub's Terms through its Service,
+no permission is granted to use, copy, modify, publish, distribute, sublicense, sell, or
+create derivative works from this software or source code, in whole or in part, without
+prior written authorization from the copyright holder.
