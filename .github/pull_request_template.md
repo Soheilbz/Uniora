@@ -19,4 +19,4 @@
 ## Security & Compliance
 
 - [ ] No credentials, secrets, or institutional data included
-- [ ] Conforms to security policy defined in [SECURITY.md](file:///home/soheil/Desktop/Uniora/SECURITY.md)
+- [ ] Conforms to the security policy defined in [SECURITY.md](https://github.com/Soheilbz/Uniora/blob/main/SECURITY.md)

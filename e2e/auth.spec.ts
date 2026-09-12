@@ -223,6 +223,7 @@ test("the account lockout brake answers, and stays silent about why", async ({
      check — and must be indistinguishable from a wrong password. */
   test.slow();
   await page.goto("/sign-in");
+  await expect(page.locator('form[data-sign-in-hydrated="true"]')).toBeVisible();
   await page.getByLabel("کد دانشگاه").fill(state.tenantA.slug);
   await page.getByLabel("نام کاربری").fill(state.tenantA.users.reader.username);
   for (let attempt = 0; attempt < 5; attempt++) {

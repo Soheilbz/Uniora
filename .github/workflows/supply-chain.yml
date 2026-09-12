@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: supply-chain-${{ github.head_ref || github.ref }}
+  group: supply-chain-${{ github.event.pull_request.number || github.ref }}
   # A newer commit supersedes an older supply-chain result for the same ref.
   cancel-in-progress: true
 
