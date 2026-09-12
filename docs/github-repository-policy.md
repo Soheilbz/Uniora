@@ -34,15 +34,17 @@ or production-credential decision.
 ## Actions and automation
 
 - Actions are enabled with a selected-action allow-list. GitHub-owned actions
-  are not allowed wholesale; only the exact action repositories used by the
-  checked-in workflows are allow-listed. Every external action reference must
-  be pinned to a full commit SHA, and the repository enforces SHA pinning.
+  are allowed, but every action reference must still be pinned to a full
+  commit SHA, and the repository enforces SHA pinning. Third-party actions are
+  limited to `anchore/sbom-action`, `aquasecurity/trivy-action`, its nested
+  `aquasecurity/setup-trivy`, and `sigstore/cosign-installer`; marketplace-wide
+  verified-publisher access is off.
 - The default `GITHUB_TOKEN` permission is read-only. Workflows request extra
   permissions only for the jobs that need them. First-time contributors need
   approval before workflows from their pull requests run.
-- The allow-list must be updated together with any newly introduced action
-  repository. Existing Dependabot updates keep using their allow-listed action
-  repositories.
+- The allow-list must be updated together with any newly introduced direct or
+  nested third-party action repository. Existing Dependabot updates keep using
+  their allow-listed action repositories.
 - Dependabot alerts, security updates, and automatic security fixes are on.
   Weekly updates cover npm, Docker, and GitHub Actions dependencies.
 
