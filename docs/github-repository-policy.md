@@ -57,8 +57,11 @@ or production-credential decision.
   that feature available to organization-owned repositories with GitHub Team
   and Secret Protection, not this personal-account repository
   ([availability](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/detect-secret-leaks/enabling-secret-scanning-for-generic-patterns)). Automatic
-  validity checks remain off unless the owner opts in to checks that can
-  contact the secret's issuing provider.
+  validity checks are likewise unavailable for this personal-account
+  repository under its current plan
+  ([availability](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/customize-leak-detection/enable-validity-checks)).
+  If the repository later moves to an eligible organization plan, keep those
+  checks opt-in because they can contact a secret's issuing provider.
 - CodeQL runs through the pinned workflow in `.github/workflows/codeql.yml`;
   the default CodeQL setup is intentionally not configured in parallel.
 - Tagged release creation is separate from PR qualification. No production
