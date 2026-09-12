@@ -126,6 +126,29 @@ export function isExpectedCancelledStaticChunk(message: string, pageUrl: string)
   }
 }
 
+/**
+ * Next can surface a cancelled streamed response as an object-valued
+ * console.error from the framework chunk that initiated the refresh. The
+ * document remains usable and the response/asset observers still reject real
+ * chunk failures; classify only this exact same-origin static-chunk shape.
+ */
+export function isExpectedCancelledStreamConsoleError(message: string, pageUrl: string): boolean {
+  let pageOrigin = "";
+  try {
+    pageOrigin = new URL(pageUrl).origin;
+  } catch {
+    return false;
+  }
+  const match = message.match(/^JSHandle@object \[(https?:\/\/[^\]]+)\]$/);
+  if (!match?.[1]) return false;
+  try {
+    const resource = new URL(match[1]);
+    return resource.origin === pageOrigin && resource.pathname.startsWith("/_next/static/chunks/");
+  } catch {
+    return false;
+  }
+}
+
 function observe(
   page: Page,
 ): Observed & { allow: (pattern: RegExp) => void; assertClean: () => void } {
@@ -143,7 +166,12 @@ function observe(
     if (message.type() === "error") {
       const location = message.location().url;
       const text = location ? `${message.text()} [${location}]` : message.text();
-      if (!isExpectedCancelledStaticChunk(text, page.url())) seen.consoleErrors.push({ text });
+      if (
+        !isExpectedCancelledStaticChunk(text, page.url()) &&
+        !isExpectedCancelledStreamConsoleError(text, page.url())
+      ) {
+        seen.consoleErrors.push({ text });
+      }
     }
   });
   page.on("pageerror", (error) => {

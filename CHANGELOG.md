@@ -48,7 +48,7 @@ All notable source releases are documented here.
 
 ### Identity / database
 
-- Completed the Better Auth 1.7.2 SCIM schema with the seven plugin-owned provisioning models required by the configured static/application-owned SCIM mode.
+- Completed the Better Auth 1.7.3 SCIM schema with the seven plugin-owned provisioning models required by the configured static/application-owned SCIM mode.
 - Added migration `0037_final_release_hardening` and Drizzle schema declarations for SCIM runtime tables plus a sanitized platform operational-health projection.
 - Replaced marker-only Better Auth reconciliation with a machine-verifiable model/field/migration contract.
 
@@ -57,7 +57,7 @@ All notable source releases are documented here.
 - Completed the Linux-first production migration: deterministic portable source packaging, Docker Compose/systemd deployment assets, host preflight, Linux-safe process/tool resolution, and cross-platform release/migration tooling.
 - Split production credentials into Web, tenant-worker, Platform-worker, and one-shot operations domains; introduced dedicated `univ_job_worker` and `univ_platform_worker` roles with fail-closed canonical grant policies and production privilege introspection.
 - Hardened Web/worker/Platform-worker configuration preflights against credential leakage and added Linux case-sensitive import validation plus worker-runtime closure checks to the release gates.
-- Reconciled the pnpm lock graph with Better Auth 1.7.2, Passkey, SCIM, SSO, LDAP and QR-code dependencies; removed all stale Better Auth 1.7.1 references.
+- Reconciled the pnpm lock graph with Better Auth 1.7.3, Passkey, SCIM, SSO, LDAP and QR-code dependencies; removed all stale Better Auth 1.7.1 references.
 - Added a fail-closed release-preparation gate requiring SHA-512 integrity for every explicit npm-registry tarball after lockfile refresh.
 - Added explicit production object-storage public/internal endpoint, timeout/read-bound and trusted-proxy contracts; aligned CSP with the configured browser upload origin.
 - Moved backup-health reporting to sanitized database metadata so the Web process never needs backup directories or privileged backup credentials.

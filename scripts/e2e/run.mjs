@@ -14,6 +14,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { findFreePorts } from "../runtime-port.ts";
 import { startPlatformWorker } from "./platform-worker.mjs";
+import { provisionLanes } from "./provision-lanes.mjs";
 
 /**
  * Runs the E2E suite as several parallel groups.
@@ -274,29 +275,17 @@ function cleanupLaneDatabases() {
 }
 
 console.log("── provisioning ──");
-for (const lane of lanes) {
-  const env = groupEnv(lane.group, lane.project);
-  /* Stale cookies or state from an earlier run would survive a rebuild of
-     the database only to point at sessions that no longer exist. */
-  rmSync(env.E2E_AUTH_DIR, { recursive: true, force: true });
-  rmSync(env.E2E_STATE_FILE, { force: true });
-  /* Playwright creates this lazily, but all groups start together. Creating
-     every output directory up front prevents one group's reporter cleanup
-     from observing another group's not-yet-created directory. */
-  rmSync(env.E2E_ARTIFACTS_DIR, { recursive: true, force: true });
-  mkdirSync(env.E2E_ARTIFACTS_DIR, { recursive: true });
-  const label = `[g${lane.group}/${lane.project}] `;
-  process.stdout.write(`${label}provision ${env.E2E_DB_NAME}\n`);
-  const ran = spawnSync(process.execPath, [join("scripts", "e2e", "provision.mjs")], {
-    cwd: root,
-    encoding: "utf8",
-    env: { ...process.env, ...env },
+try {
+  await provisionLanes({
+    concurrency: laneConcurrency,
+    groupEnv,
+    lanes,
+    root,
   });
-  if (ran.status !== 0) {
-    console.error(`${label}provision failed:\n${ran.stdout}${ran.stderr}`);
-    cleanupLaneDatabases();
-    process.exit(ran.status ?? 1);
-  }
+} catch (error) {
+  cleanupLaneDatabases();
+  console.error("E2E provisioning failed:", error);
+  process.exit(error.exitCode ?? 1);
 }
 
 /* Line-buffered relay, so concurrent groups cannot interleave mid-line. */

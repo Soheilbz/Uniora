@@ -5,24 +5,24 @@
 !.env.*.example
 
 # Generated application, database and test state
-node_modules/
-.next/
-.next-dev/
-.next-release/
-.univ/
-.runtime-closures/
-.tmp/
-releases/
-coverage/
-backups/
-exports/
-audit-seals/
-dr-reports/
-e2e/.auth/
-e2e/.state.json
-e2e/.run-*/
-playwright-report/
-test-results/
+/node_modules/
+/.next/
+/.next-dev/
+/.next-release/
+/.univ/
+/.runtime-closures/
+/.tmp/
+/releases/
+/coverage/
+/backups/
+/exports/
+/audit-seals/
+/dr-reports/
+/e2e/.auth/
+/e2e/.state.json
+/e2e/.run-*/
+/playwright-report/
+/test-results/
 
 # Local archives and logs
 *.log
@@ -33,3 +33,13 @@ test-results/
 *.dump.enc.json
 *.sig
 *.pem
+
+# Operating system and editor artifacts
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+

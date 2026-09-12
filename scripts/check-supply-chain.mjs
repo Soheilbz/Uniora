@@ -75,12 +75,13 @@ for (const token of [
 }
 
 const ci = read(".github/workflows/ci.yml");
+const postgresClientAction = read(".github/actions/setup-postgres-client/action.yml");
 for (const token of [
   "permissions:",
   "contents: read",
   "performance:",
   "performance:regression",
-  "PostgreSQL 18.6 client from pinned service image",
+  "./.github/actions/setup-postgres-client",
   "MFA old-key rotation drill",
   "Backup old-key, rekey",
   "Background export worker drill",
@@ -94,6 +95,16 @@ for (const token of [
   "pnpm check:licenses",
 ]) {
   if (!ci.includes(token)) failures.push(`CI hardening missing ${token}`);
+}
+for (const token of [
+  "PostgreSQL client",
+  "postgres:18.6@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280",
+  "postgres-container-client.mjs",
+  "PG_BIN_DIR=",
+  "PG_DOCKER_IMAGE=",
+]) {
+  if (!postgresClientAction.includes(token))
+    failures.push(`pinned PostgreSQL client action missing ${token}`);
 }
 
 const bootstrap = read("scripts/setup-local.mjs");

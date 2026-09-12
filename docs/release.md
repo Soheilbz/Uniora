@@ -1,5 +1,10 @@
 # Release Process
 
+GitHub-hosted repository controls are documented in the
+[GitHub repository policy](github-repository-policy.md). That document is the
+canonical record for branch protection, Actions permissions, security settings,
+and deployment-environment boundaries.
+
 ## Versioning
 
 The application follows semantic versioning while pre-1.0. Patch releases may contain repository hygiene, operational hardening and defect fixes without changing the public domain model.
