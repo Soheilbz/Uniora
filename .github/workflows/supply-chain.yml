@@ -1,8 +1,8 @@
+# Image/SBOM scanning is a required PR gate and a scheduled drift scan. Do not
+# rebuild the same images a second time on the resulting protected main merge.
 name: Supply chain
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
   schedule:
