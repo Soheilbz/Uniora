@@ -47,25 +47,25 @@ jobs:
         if: always()
         run: pnpm docker:cleanup --apply --keep=univ-web:supply-chain,univ-web-tenant-worker:supply-chain,univ-web-platform-worker:supply-chain,univ-web-operations:supply-chain
       - name: Generate runner image SBOM
-        uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
+        uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
         with:
           image: univ-web:supply-chain
           format: spdx-json
           output-file: sbom-runner.spdx.json
       - name: Generate tenant-worker image SBOM
-        uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
+        uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
         with:
           image: univ-web-tenant-worker:supply-chain
           format: spdx-json
           output-file: sbom-tenant-worker.spdx.json
       - name: Generate platform-worker image SBOM
-        uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
+        uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
         with:
           image: univ-web-platform-worker:supply-chain
           format: spdx-json
           output-file: sbom-platform-worker.spdx.json
       - name: Generate operations image SBOM
-        uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
+        uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
         with:
           image: univ-web-operations:supply-chain
           format: spdx-json
@@ -103,7 +103,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: os,library
       - name: Upload image SBOMs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: univ-web-image-sboms
           path: sbom-*.spdx.json
